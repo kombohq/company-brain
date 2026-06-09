@@ -1,0 +1,45 @@
+name: Commit and push
+description: >-
+  Commit changes under the given paths, rebase onto the latest remote, and push.
+  The rebase pulls in commits that landed during a long-running job so the push
+  doesn't get rejected.
+
+inputs:
+  message:
+    description: Commit message.
+    required: true
+  paths:
+    description: Pathspecs to stage (one per line or space-separated, e.g. "notion/**").
+    required: true
+  branch:
+    description: Branch to push to.
+    required: false
+    default: main
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        INPUT_MESSAGE: ${{ inputs.message }}
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_BRANCH: ${{ inputs.branch }}
+      run: |
+        set -euo pipefail
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        # A clean rebase needs history; deepen a shallow checkout.
+        if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+          git fetch --unshallow origin "$INPUT_BRANCH" || git fetch --depth=200 origin "$INPUT_BRANCH"
+        fi
+
+        read -r -a paths <<< "$(echo "$INPUT_PATHS" | tr '\n' ' ')"
+        git add -- "${paths[@]}"
+        if git diff --cached --quiet; then
+          echo "Nothing to commit."
+          exit 0
+        fi
+        git commit -m "$INPUT_MESSAGE"
+        git pull --rebase origin "$INPUT_BRANCH"
+        git push origin "HEAD:${INPUT_BRANCH}"
