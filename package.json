@@ -1,0 +1,15 @@
+{
+  "name": "company-brain",
+  "version": "0.1.0",
+  "description": "A long-term sync hub that checks your company's data sources into Git as searchable files, so an AI agent has durable context.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
