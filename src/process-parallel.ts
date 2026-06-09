@@ -38,7 +38,9 @@ export async function processParallel<T>({
   const workerFn = async () => {
     while (!error) {
       const result = await safeNext();
-      if (result.done) break;
+      if (result.done) {
+        break;
+      }
 
       try {
         await fn(result.value);
@@ -53,7 +55,9 @@ export async function processParallel<T>({
   }
 
   await Promise.all(workers);
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 }
 
 async function* valuesFrom<T>(
