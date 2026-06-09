@@ -1,0 +1,4 @@
+node_modules
+bun.lock
+
+# Synced data folders are generated and added by each connector.
