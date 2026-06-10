@@ -8,6 +8,7 @@
     "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
+    "notion:sync": "bun run src/connectors/notion/sync.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -18,5 +19,9 @@
     "oxlint": "^1.68.0",
     "prettier": "^3.8.3",
     "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "@notionhq/client": "^5.22.0",
+    "gray-matter": "^4.0.3"
   }
 }
