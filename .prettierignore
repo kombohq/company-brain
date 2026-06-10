@@ -1,4 +1,5 @@
 node_modules
 bun.lock
 
-# Synced data folders are generated and added by each connector.
+# Synced data is generated; never format it.
+context
