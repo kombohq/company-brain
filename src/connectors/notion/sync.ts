@@ -12,7 +12,7 @@
  */
 
 import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
-import { dirname, join, posix, relative } from "path";
+import { dirname, join, posix, relative, sep } from "path";
 import { processParallel } from "../../lib/process-parallel.js";
 import { contextDir } from "../../lib/paths.js";
 import { NotionSyncClient, type NotionNode } from "./notion-client.js";
@@ -50,7 +50,7 @@ async function scanDisk(): Promise<Map<string, DiskEntry>> {
         const parsed = parseFrontmatter(await readFile(full, "utf-8"));
         if (parsed) {
           map.set(parsed.notionId, {
-            relPath: relative(OUT_DIR, full),
+            relPath: relative(OUT_DIR, full).split(sep).join("/"),
             lastEditedTime: parsed.lastEditedTime,
           });
         }

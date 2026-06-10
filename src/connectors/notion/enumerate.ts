@@ -48,10 +48,10 @@ export async function enumerate(
         log(`    "${ds.title || "untitled"}": ${n} row(s) so far...`);
       }
     });
+    // The query result is fresher than search (whose index lags), so let it win
+    // on last_edited_time and avoid skipping an incremental refetch.
     for (const row of rows) {
-      if (!byId.has(row.id)) {
-        byId.set(row.id, row);
-      }
+      byId.set(row.id, row);
     }
     totalRows += rows.length;
     log(

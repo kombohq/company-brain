@@ -363,6 +363,8 @@ export class NotionSyncClient {
       for (const blockId of pending) {
         const extra = await this.fetchUnknownBlock(blockId);
         if (!extra) {
+          // 404'd block stays unreachable: the body is incomplete, keep it flagged.
+          stillTruncated = true;
           continue;
         }
         parts.push(extra.markdown);
