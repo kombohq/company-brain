@@ -3,5 +3,10 @@ node_modules/
 .env.local
 *.log
 
+# Synced data. This is the public template, so real synced content is never
+# committed here. In your own fork, remove this line to commit the data the
+# sync workflows produce under context/.
+/context/
+
 # macOS system files
 .DS_Store

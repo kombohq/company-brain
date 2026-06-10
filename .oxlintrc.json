@@ -14,5 +14,5 @@
       { "disallowTypeAnnotations": false }
     ]
   },
-  "ignorePatterns": ["node_modules"]
+  "ignorePatterns": ["node_modules", "context"]
 }
