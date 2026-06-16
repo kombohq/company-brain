@@ -1,0 +1,36 @@
+# Mirrors a Zendesk Help Center's published articles into context/ via the
+# reusable ./.github/actions/sync-zendesk action. It uses the anonymous public
+# API, so no secret is required.
+#
+# To sync more Help Centers, either add another step below or copy this file; in
+# each case point the step at a different subdomain and directory.
+#
+# Note: this template git-ignores context/, so the commit step is a no-op here. In
+# a fork that wants to commit synced data, remove context/ from .gitignore.
+name: Sync Zendesk
+
+on:
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 04:30 UTC daily.
+  #   - cron: "30 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-context-sync-zendesk
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/sync-zendesk
+        with:
+          subdomain: kombo-api
+          directory: context/kombo-api
