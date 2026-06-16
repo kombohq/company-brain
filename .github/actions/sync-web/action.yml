@@ -1,8 +1,9 @@
-name: Sync website
+name: Sync web
 description: >-
-  Crawl a website (or read its sitemap) into the given directory as markdown and
-  commit the result. Use one step (or one workflow) per site, each passing its own
-  start URL and directory, to mirror several sites into the context.
+  Crawl web content (a site, docs, a help center, ...) or read its sitemap into
+  the given directory as markdown and commit the result. Use one step (or one
+  workflow) per source, each passing its own start URL and directory, to mirror
+  several sources into the context.
 
 inputs:
   url:
@@ -35,14 +36,14 @@ runs:
       shell: bash
       run: bun install --frozen-lockfile
 
-    - name: Sync website
+    - name: Sync web
       shell: bash
       env:
-        WEBSITE_URL: ${{ inputs.url }}
-        WEBSITE_INCLUDE: ${{ inputs.include }}
-        WEBSITE_OUT_DIR: ${{ inputs.directory }}
-        WEBSITE_MAX_PAGES: ${{ inputs.max-pages }}
-      run: bun run website:sync
+        WEB_URL: ${{ inputs.url }}
+        WEB_INCLUDE: ${{ inputs.include }}
+        WEB_OUT_DIR: ${{ inputs.directory }}
+        WEB_MAX_PAGES: ${{ inputs.max-pages }}
+      run: bun run web:sync
 
     - name: Commit and push changes
       uses: ./.github/actions/commit-and-push

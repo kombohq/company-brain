@@ -1,13 +1,14 @@
-# Mirrors websites into context/ via the reusable ./.github/actions/sync-website
-# action. Each step crawls one site (or reads its sitemap) into its own directory.
-# Use the `include` input to restrict which paths are synced.
+# Mirrors web content into context/ via the reusable ./.github/actions/sync-web
+# action. Each step crawls one source (a site, docs, a help center, ...) or reads
+# its sitemap into its own directory. Use the `include` input to restrict which
+# paths are synced.
 #
-# To sync more sites, either add another step below or copy this file; in each
+# To sync more sources, either add another step below or copy this file; in each
 # case point the step at a different URL and directory.
 #
 # Note: this template git-ignores context/, so the commit step is a no-op here. In
 # a fork that wants to commit synced data, remove context/ from .gitignore.
-name: Sync websites
+name: Sync web
 
 on:
   # Uncomment to enable automatic daily sync.
@@ -17,7 +18,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.repository }}-context-sync-website
+  group: ${{ github.repository }}-context-sync-web
   cancel-in-progress: false
 
 jobs:
@@ -30,17 +31,17 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: ./.github/actions/sync-website
+      - uses: ./.github/actions/sync-web
         with:
           url: https://kombo.dev
           directory: context/kombo.dev
 
-      - uses: ./.github/actions/sync-website
+      - uses: ./.github/actions/sync-web
         with:
           url: https://docs.kombo.dev
           directory: context/docs.kombo.dev
 
-      - uses: ./.github/actions/sync-website
+      - uses: ./.github/actions/sync-web
         with:
           url: https://help.kombo.dev
           directory: context/help.kombo.dev
