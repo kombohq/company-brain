@@ -32,8 +32,17 @@ function run(cmd: string, args: string[], cwd?: string): void {
 }
 
 function repoName(repoUrl: string): string {
-  const segments = repoUrl.replace(/\.git$/, "").split("/");
-  return segments[segments.length - 1];
+  const name = repoUrl
+    .replace(/\/+$/, "")
+    .replace(/\.git$/, "")
+    .split("/")
+    .pop();
+  if (!name) {
+    throw new Error(
+      `Could not derive a directory name from REPO_URL "${repoUrl}"; set REPO_OUT_DIR explicitly.`,
+    );
+  }
+  return name;
 }
 
 /** Resolve "owner/name" to a github.com clone URL, leaving full URLs untouched. */
