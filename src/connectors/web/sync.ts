@@ -20,11 +20,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
 import { dirname, join, resolve } from "path";
 import { contextDir } from "../../lib/paths.js";
-import { processParallel } from "../../lib/process-parallel.js";
-import { discover, makeLinkResolver, relPathForUrl } from "./discover.js";
+import { crawl, makeLinkResolver, relPathForUrl } from "./discover.js";
 import { htmlToMarkdown, pageTitle, serializePage, urlOf } from "./markdown.js";
 
-const FETCH_CONCURRENCY = 5;
 const DEFAULT_MAX_PAGES = 1000;
 
 function config() {
@@ -75,37 +73,31 @@ async function syncWeb(): Promise<void> {
   const { startUrl, include, maxPages, outDir } = config();
   const startedAt = Date.now();
 
-  console.log(`Discovering pages from ${startUrl}...`);
-  const { urls, html, failed } = await discover({
-    startUrl,
-    include,
-    maxPages,
-  });
   const disk = await scanDisk(outDir);
-  console.log(`Found ${urls.length} page(s); ${disk.size} already on disk.`);
+  console.log(`Crawling ${startUrl} (${disk.size} page(s) already on disk)...`);
 
   const resolveLink = makeLinkResolver({
     siteHost: new URL(startUrl).host,
     include,
   });
 
+  // Write each page as it is crawled, so the whole site never sits in memory.
   await mkdir(outDir, { recursive: true });
   const synced = new Set<string>();
-  await processParallel({
-    concurrency: FETCH_CONCURRENCY,
-    data: urls,
-    fn: async (url) => {
-      const body = html.get(url)!;
-      const dest = join(outDir, relPathForUrl(url));
-      await mkdir(dirname(dest), { recursive: true });
-      const markdown = htmlToMarkdown(body, (href) => resolveLink(url, href));
-      await writeFile(
-        dest,
-        serializePage(url, pageTitle(body) || url, markdown),
-      );
-      synced.add(url);
-    },
-  });
+  const failed = new Set<string>();
+  for await (const { url, body } of crawl(
+    { startUrl, include, maxPages },
+    failed,
+  )) {
+    const dest = join(outDir, relPathForUrl(url));
+    await mkdir(dirname(dest), { recursive: true });
+    const markdown = htmlToMarkdown(body, (href) => resolveLink(url, href));
+    await writeFile(dest, serializePage(url, pageTitle(body) || url, markdown));
+    synced.add(url);
+    if (synced.size % 25 === 0) {
+      console.log(`  wrote ${synced.size} page(s)...`);
+    }
+  }
 
   // Prune pages that vanished (no longer discovered, or returned 404), but keep
   // files whose page only failed transiently this run.

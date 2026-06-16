@@ -108,16 +108,18 @@ function linksFrom(body: string, sitemap: boolean): string[] {
   return [...body.matchAll(pattern)].map((m) => m[1].trim());
 }
 
+export type Page = { url: string; body: string };
+
 /**
- * Returns the page URLs to sync, the HTML fetched for each (so callers avoid
- * refetching), and URLs that failed with a non-404 error so callers can keep
- * their existing files instead of pruning them on a transient outage.
+ * Crawls the source and yields each page's HTML as it is fetched, so the caller
+ * can write pages one at a time instead of buffering the whole site in memory.
+ * URLs that fail with a non-404 error are added to `failed` so the caller can
+ * keep their existing files instead of pruning them on a transient outage.
  */
-export async function discover(config: DiscoverConfig): Promise<{
-  urls: string[];
-  html: Map<string, string>;
-  failed: Set<string>;
-}> {
+export async function* crawl(
+  config: DiscoverConfig,
+  failed: Set<string>,
+): AsyncGenerator<Page> {
   const start = normalizeUrl(config.startUrl);
   if (!start) {
     throw new Error(`Invalid start URL: ${config.startUrl}`);
@@ -126,11 +128,9 @@ export async function discover(config: DiscoverConfig): Promise<{
   const matches = (url: string) =>
     !config.include || config.include.test(new URL(url).pathname);
 
-  const html = new Map<string, string>();
-  const failed = new Set<string>();
-  const kept: string[] = [];
   const queued = new Set([start]);
   const queue = [start];
+  let kept = 0;
 
   while (queue.length) {
     const url = queue.shift()!;
@@ -154,17 +154,15 @@ export async function discover(config: DiscoverConfig): Promise<{
     }
 
     const sitemap = isSitemap(res.body);
-    if (!sitemap) {
-      html.set(url, res.body);
-      if (matches(url)) {
-        kept.push(url);
-        if (kept.length > config.maxPages) {
-          throw new Error(
-            `Found more than WEB_MAX_PAGES=${config.maxPages} pages; ` +
-              `raise the cap (or tighten WEB_INCLUDE) to sync the whole source.`,
-          );
-        }
+    if (!sitemap && matches(url)) {
+      kept += 1;
+      if (kept > config.maxPages) {
+        throw new Error(
+          `Found more than WEB_MAX_PAGES=${config.maxPages} pages; ` +
+            `raise the cap (or tighten WEB_INCLUDE) to sync the whole source.`,
+        );
       }
+      yield { url, body: res.body };
     }
     for (const link of linksFrom(res.body, sitemap)) {
       const next = normalizeUrl(link, url);
@@ -178,5 +176,4 @@ export async function discover(config: DiscoverConfig): Promise<{
       }
     }
   }
-  return { urls: kept, html, failed };
 }
