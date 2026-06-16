@@ -78,11 +78,16 @@ async function syncZendesk(): Promise<void> {
   for await (const article of client.articles()) {
     seen.add(article.id);
     const dest = join(outDir, `${article.id}.md`);
+    const existingPath = disk.get(article.id);
+    const current = existingPath ? await readFile(existingPath, "utf-8") : null;
     const next = serializeArticle(article);
-    const current = disk.get(article.id) ? await readFile(dest, "utf-8") : null;
     if (current !== next) {
       await writeFile(dest, next);
       written += 1;
+    }
+    // The file was stored under a non-canonical name; drop the stale copy.
+    if (existingPath && existingPath !== dest) {
+      await rm(existingPath, { force: true });
     }
   }
 
