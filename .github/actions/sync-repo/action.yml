@@ -1,0 +1,54 @@
+name: Sync repository
+description: >-
+  Shallow-clone a Git repository into the given directory and commit the result.
+  Use one step (or one workflow) per repository, each passing its own token and
+  directory, to mirror several repositories into the context.
+
+inputs:
+  repository:
+    description: 'Repository to pull, either "owner/name" (GitHub) or a full clone URL.'
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/kombo").
+    required: true
+  token:
+    description: >-
+      Access token for private repositories; omit for public ones. Use a
+      fine-grained PAT (https://github.com/settings/personal-access-tokens/new)
+      scoped to only the source repo with "Contents: Read-only" and nothing else.
+    required: false
+    default: ""
+  ref:
+    description: Branch, tag, or commit to check out. Defaults to the repository's HEAD.
+    required: false
+    default: ""
+  commit-message:
+    description: 'Commit message for the synced changes. Defaults to "chore: sync <repository>".'
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    - name: Sync repository
+      shell: bash
+      env:
+        REPO_URL: ${{ inputs.repository }}
+        REPO_TOKEN: ${{ inputs.token }}
+        REPO_REF: ${{ inputs.ref }}
+        REPO_OUT_DIR: ${{ inputs.directory }}
+      run: bun run repo:sync
+
+    - name: Commit and push changes
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: "${{ inputs.commit-message || format('chore: sync {0}', inputs.repository) }}"
+        paths: "${{ inputs.directory }}/**"
