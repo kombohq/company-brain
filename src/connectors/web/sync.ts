@@ -6,7 +6,8 @@
  *   WEB_URL       start page, or a sitemap (.xml); its host bounds the crawl
  *   WEB_INCLUDE   regex (optional); only paths matching it are synced
  *   WEB_OUT_DIR   directory to mirror into (optional; defaults to context/<host>)
- *   WEB_MAX_PAGES safety cap on pages per run (optional; defaults to 1000)
+ *   WEB_MAX_PAGES fail the run if more than this many pages are found, rather
+ *                 than mirroring a partial subset (optional; defaults to 1000)
  *
  * Pages that disappear upstream are pruned: every file records its source URL in
  * frontmatter, and files whose URL is no longer reachable are deleted. A run that
@@ -20,7 +21,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
 import { dirname, join, resolve } from "path";
 import { contextDir } from "../../lib/paths.js";
 import { processParallel } from "../../lib/process-parallel.js";
-import { discover, relPathForUrl } from "./discover.js";
+import { discover, makeLinkResolver, relPathForUrl } from "./discover.js";
 import { htmlToMarkdown, pageTitle, serializePage, urlOf } from "./markdown.js";
 
 const FETCH_CONCURRENCY = 5;
@@ -83,6 +84,11 @@ async function syncWeb(): Promise<void> {
   const disk = await scanDisk(outDir);
   console.log(`Found ${urls.length} page(s); ${disk.size} already on disk.`);
 
+  const resolveLink = makeLinkResolver({
+    siteHost: new URL(startUrl).host,
+    include,
+  });
+
   await mkdir(outDir, { recursive: true });
   const synced = new Set<string>();
   await processParallel({
@@ -92,9 +98,10 @@ async function syncWeb(): Promise<void> {
       const body = html.get(url)!;
       const dest = join(outDir, relPathForUrl(url));
       await mkdir(dirname(dest), { recursive: true });
+      const markdown = htmlToMarkdown(body, (href) => resolveLink(url, href));
       await writeFile(
         dest,
-        serializePage(url, pageTitle(body) || url, htmlToMarkdown(body)),
+        serializePage(url, pageTitle(body) || url, markdown),
       );
       synced.add(url);
     },

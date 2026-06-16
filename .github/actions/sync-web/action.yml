@@ -17,7 +17,7 @@ inputs:
     required: false
     default: ""
   max-pages:
-    description: Safety cap on the number of pages fetched per run.
+    description: Fail the run if more than this many pages are found (avoids a partial mirror).
     required: false
     default: "1000"
   commit-message:

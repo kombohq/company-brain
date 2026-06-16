@@ -6,7 +6,11 @@
  * include regex (tested against the path) narrows what is crawled and kept.
  */
 
-const USER_AGENT = "company-brain-web-sync";
+import { posix } from "path";
+
+const USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36";
 
 export type DiscoverConfig = {
   startUrl: string;
@@ -15,7 +19,7 @@ export type DiscoverConfig = {
 };
 
 /** origin + path without a trailing slash, so "/docs" and "/docs/" are one page. */
-function normalizeUrl(input: string, base?: string): string | null {
+export function normalizeUrl(input: string, base?: string): string | null {
   const url = base ? new URL(input, base) : new URL(input);
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     return null;
@@ -37,6 +41,42 @@ export function relPathForUrl(url: string): string {
     .map((segment) => decodeURIComponent(segment).replace(/[^\w.-]+/g, "-"))
     .join("/");
   return `${safe}.md`;
+}
+
+/**
+ * Builds a link rewriter for a given site: a link from `from` to a same-host page
+ * matching `include` resolves to a relative path to that page's local .md (assumed
+ * to exist in a full sync); anything else returns its full URL, and same-page
+ * anchors or non-http schemes return null so the original href is kept.
+ */
+export function makeLinkResolver(opts: { siteHost: string; include?: RegExp }) {
+  const isLocalPage = (url: string) =>
+    new URL(url).host === opts.siteHost &&
+    (!opts.include || opts.include.test(new URL(url).pathname));
+
+  return (from: string, href: string): string | null => {
+    let absolute: URL;
+    try {
+      absolute = new URL(href, from);
+    } catch {
+      return null;
+    }
+    if (absolute.protocol !== "http:" && absolute.protocol !== "https:") {
+      return null;
+    }
+    const target = normalizeUrl(absolute.href)!;
+    if (target === from) {
+      return null;
+    }
+    if (!isLocalPage(target)) {
+      return absolute.href;
+    }
+    const rel = posix.relative(
+      posix.dirname(relPathForUrl(from)),
+      relPathForUrl(target),
+    );
+    return rel.startsWith(".") ? rel : `./${rel}`;
+  };
 }
 
 type HttpResponse = {
@@ -92,7 +132,7 @@ export async function discover(config: DiscoverConfig): Promise<{
   const queued = new Set([start]);
   const queue = [start];
 
-  while (queue.length && kept.length < config.maxPages) {
+  while (queue.length) {
     const url = queue.shift()!;
     let res: HttpResponse;
     try {
@@ -118,6 +158,12 @@ export async function discover(config: DiscoverConfig): Promise<{
       html.set(url, res.body);
       if (matches(url)) {
         kept.push(url);
+        if (kept.length > config.maxPages) {
+          throw new Error(
+            `Found more than WEB_MAX_PAGES=${config.maxPages} pages; ` +
+              `raise the cap (or tighten WEB_INCLUDE) to sync the whole source.`,
+          );
+        }
       }
     }
     for (const link of linksFrom(res.body, sitemap)) {

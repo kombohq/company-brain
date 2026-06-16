@@ -46,8 +46,28 @@ export function pageTitle(html: string): string {
   return match ? decodeEntities(match[1]).trim() : "";
 }
 
-export function htmlToMarkdown(html: string): string {
-  const region = contentRegion(html).replace(CHROME, "");
+/** Rewrite each <a href> a resolver maps to a local file, leaving the rest as-is. */
+function rewriteLinks(html: string, resolve: LinkResolver): string {
+  return html.replace(
+    /(<a\b[^>]*?\bhref\s*=\s*)(["'])(.*?)\2/gi,
+    (full, prefix, quote, href) => {
+      const local = resolve(href);
+      return local ? `${prefix}${quote}${local}${quote}` : full;
+    },
+  );
+}
+
+/** Maps a raw href to a relative path to its local .md file, or null to keep it. */
+export type LinkResolver = (href: string) => string | null;
+
+export function htmlToMarkdown(
+  html: string,
+  resolveLink?: LinkResolver,
+): string {
+  let region = contentRegion(html).replace(CHROME, "");
+  if (resolveLink) {
+    region = rewriteLinks(region, resolveLink);
+  }
   return turndown
     .turndown(region)
     .replace(/\[[\s\u200b]*\]\([^)]*\)/g, "")
