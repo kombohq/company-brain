@@ -1,17 +1,20 @@
 /**
  * HTML page -> markdown file: pull out the main content and title, convert to
  * markdown, and read/write the YAML frontmatter that records each page's source
- * URL (used for change detection and deletion tracking).
+ * URL (used to map a file back to its page for deletion tracking). Nothing
+ * volatile is stored, so an unchanged page produces a byte-identical file.
  */
 
 import matter from "gray-matter";
 import TurndownService from "turndown";
+import { addTableRules } from "./tables.js";
 
 const turndown = new TurndownService({
   headingStyle: "atx",
   codeBlockStyle: "fenced",
 });
 turndown.keep(["pre", "code"]);
+addTableRules(turndown);
 
 /** Tags that never carry page content; dropped before conversion. */
 const CHROME =
@@ -81,11 +84,7 @@ export function serializePage(
   title: string,
   body: string,
 ): string {
-  return matter.stringify(`\n${body}\n`, {
-    url,
-    title,
-    fetched_at: new Date().toISOString(),
-  });
+  return matter.stringify(`\n${body}\n`, { url, title });
 }
 
 /** Source URL stored in a file's frontmatter, or null if it isn't a synced page. */
