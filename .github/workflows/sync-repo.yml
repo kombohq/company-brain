@@ -1,0 +1,43 @@
+# Mirrors other Git repositories into context/ via the reusable
+# ./.github/actions/sync-repo action. Each step shallow-clones one repository
+# into its own directory.
+#
+# Private repositories need a token passed as a repo secret. Create a fine-grained
+# PAT at https://github.com/settings/personal-access-tokens/new with the minimal
+# access: scope it to only the source repo and grant "Contents: Read-only"
+# (Metadata: Read-only is added automatically; grant nothing else). Public
+# repositories need no token, so the `token` input can be omitted.
+#
+# To sync more repositories, either add another step below or copy this file; in
+# each case point the step at a different repository, secret, and directory.
+#
+# Note: this template git-ignores context/, so the commit step is a no-op here. In
+# a fork that wants to commit synced data, remove context/ from .gitignore.
+name: Sync repositories
+
+on:
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 03:45 UTC daily.
+  #   - cron: "45 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-context-sync-repo
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/sync-repo
+        with:
+          repository: owner/example
+          directory: context/example
+          token: ${{ secrets.EXAMPLE_REPO_TOKEN }}

@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "notion:sync": "bun run src/connectors/notion/sync.ts",
+    "repo:sync": "bun run src/connectors/repo/sync.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
