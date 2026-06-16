@@ -17,9 +17,12 @@ This repo pulls **external data into `context/`** as plain files so an agent can
 - **Bun only.** Scripts run with `bun run …`; no build step, no npm/pnpm/yarn.
 - **Keep it lean.** Do the smallest thing that works. Add a dependency only when there's a concrete need, and never drag in tooling from other repos (no databases, queues, web frameworks) just because a similar connector elsewhere had them.
 - **Raw + derived artifacts.** Persist the raw structured dump (JSON) next to an agent-friendly derivation (Markdown). Record the source id/url in frontmatter so files can be linked back and pruned.
-- **Incremental and self-pruning.** Refetch only what changed; delete files whose source disappeared upstream. **But skip pruning when a run discovers nothing** so a transient outage can't wipe the mirror.
+- **Deterministic output.** Writing the same upstream state must produce byte-identical files. Never write volatile metadata (timestamps like `fetched_at`, random ids); frontmatter should carry only durable identity (source id/url, title). Volatile fields create a huge diff on every run of the self-commit workflow.
+- **Cross-link the repo.** Context files should reference related files in the repo by **relative path** so the agent can navigate by following links. Rewrite upstream links to point at the synced files; when a target isn't synced, keep the full external URL.
+- **Incremental, prune only when needed.** Refetch only what changed. Deletion tracking (pruning files whose source disappeared upstream) isn't always needed, consider whether this source needs it and **ask the user if unsure**. When you do prune, **skip pruning when a run discovers nothing** so a transient outage can't wipe the mirror.
+- **Fail loud.** Most failures should crash the run so they surface in the GitHub Actions log, never silently produce a partial mirror. Only swallow a failure in incremental cases where retries are exhausted and a partial update is acceptable (follow Notion's `continue-on-error` + surface-after-commit pattern).
 - **Bounded concurrency.** For list-then-detail jobs use `processParallel` from `src/lib/process-parallel.ts` with a fixed concurrency constant beside the code. No unbounded `Promise.all`, no accumulating huge in-memory arrays, fetch → write → release.
-- **Minimal credentials.** Require the least-privileged token/scope, and say exactly how to create it.
+- **Minimal credentials.** Require the least-privileged token/scope, and document exactly how to create it: **link to the page where the credential is configured** and spell out the precise permissions needed.
 
 ## Where code goes
 
@@ -54,7 +57,7 @@ Mirror the existing actions exactly:
 1. Pick the **`<source>`** name and its `context/<source>/` output directory.
 2. Implement `src/connectors/<source>/sync.ts` with Bun; env-var config; `processParallel` for list-then-detail; incremental + safe prune.
 3. Add the **`<source>:sync`** script to `package.json`.
-4. Document the env vars in **`.env.example`** (with the minimal credential scope and where to create it).
+4. Document the env vars in **`.env.example`** (link to where the credential is created, plus the minimal permissions needed).
 5. Add the data-source section to **`README.md`** (setup steps, how to run, CI schedule).
 6. Add the reusable action and workflow under `.github/`.
 7. Verify before finishing: `bun run typecheck`, `bun run lint`, `bun run format`, and a quick local smoke run of the sync.
