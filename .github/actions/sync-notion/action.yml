@@ -1,0 +1,63 @@
+name: Sync Notion
+description: >-
+  Sync a Notion integration into the given directory and commit the result.
+  Use one workflow per integration, each passing its own token and directory.
+
+inputs:
+  notion-token:
+    description: Internal integration token used to read shared Notion content.
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/notion").
+    required: true
+  mode:
+    description: "incremental = only refetch changed pages; full = refetch all."
+    required: false
+    default: incremental
+  commit-message:
+    description: Commit message for the synced changes.
+    required: false
+    default: "chore: sync Notion"
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    # continue-on-error so a partial sync (e.g. a Notion timeout) still commits
+    # the pages it wrote; the next run resumes from there. The failure is
+    # re-surfaced after the commit.
+    - name: Sync Notion
+      id: sync
+      shell: bash
+      continue-on-error: true
+      env:
+        NOTION_TOKEN: ${{ inputs.notion-token }}
+        NOTION_OUT_DIR: ${{ inputs.directory }}
+      run: |
+        set -euo pipefail
+        if [ "${{ inputs.mode }}" = "full" ]; then
+          bun run notion:sync full
+        else
+          bun run notion:sync
+        fi
+
+    - name: Commit and push changes
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: ${{ inputs.commit-message }}
+        paths: "${{ inputs.directory }}/**"
+
+    - name: Surface sync failure
+      if: ${{ steps.sync.outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "Sync step failed; any pages synced before the failure were committed." >&2
+        exit 1
