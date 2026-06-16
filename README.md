@@ -66,6 +66,18 @@ Setup:
 
 The reusable `./.github/actions/sync-repo` action syncs one repository per step (its own repository, secret, and directory). To mirror several repositories, add more steps to `.github/workflows/sync-repo.yml` or copy the workflow, each pointing at a different repository and secret.
 
+### Website → `context/<host>/`
+
+Mirrors a website into the context as one markdown file per page (frontmatter records the source URL, body is the page's main content). The start URL can be a page (crawled breadth-first within its host) or a sitemap (`…/sitemap.xml`, including sitemap indexes). An optional regex restricts which paths are synced, and pages that disappear upstream are pruned, with a guardrail that skips pruning when a run discovers nothing.
+
+```bash
+WEBSITE_URL=https://docs.example.com bun run website:sync
+WEBSITE_URL=https://example.com WEBSITE_INCLUDE='^/docs/' bun run website:sync
+WEBSITE_URL=https://example.com/sitemap.xml WEBSITE_OUT_DIR=context/example bun run website:sync
+```
+
+The reusable `./.github/actions/sync-website` action syncs one site per step (its own URL and directory). To mirror several sites, add more steps to `.github/workflows/sync-website.yml` or copy the workflow, each pointing at a different URL and directory.
+
 ## Adding a new source
 
 See `.cursor/skills/extend-agent-context/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI).

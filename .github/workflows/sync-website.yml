@@ -1,0 +1,46 @@
+# Mirrors websites into context/ via the reusable ./.github/actions/sync-website
+# action. Each step crawls one site (or reads its sitemap) into its own directory.
+# Use the `include` input to restrict which paths are synced.
+#
+# To sync more sites, either add another step below or copy this file; in each
+# case point the step at a different URL and directory.
+#
+# Note: this template git-ignores context/, so the commit step is a no-op here. In
+# a fork that wants to commit synced data, remove context/ from .gitignore.
+name: Sync websites
+
+on:
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 04:00 UTC daily.
+  #   - cron: "0 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-context-sync-website
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/sync-website
+        with:
+          url: https://kombo.dev
+          directory: context/kombo.dev
+
+      - uses: ./.github/actions/sync-website
+        with:
+          url: https://docs.kombo.dev
+          directory: context/docs.kombo.dev
+
+      - uses: ./.github/actions/sync-website
+        with:
+          url: https://help.kombo.dev
+          directory: context/help.kombo.dev

@@ -1,0 +1,51 @@
+name: Sync website
+description: >-
+  Crawl a website (or read its sitemap) into the given directory as markdown and
+  commit the result. Use one step (or one workflow) per site, each passing its own
+  start URL and directory, to mirror several sites into the context.
+
+inputs:
+  url:
+    description: Start page to crawl, or a sitemap URL ending in ".xml".
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/kombo.dev").
+    required: true
+  include:
+    description: Regex tested against the URL path; only matching pages are synced (optional).
+    required: false
+    default: ""
+  max-pages:
+    description: Safety cap on the number of pages fetched per run.
+    required: false
+    default: "1000"
+  commit-message:
+    description: 'Commit message for the synced changes. Defaults to "chore: sync <url>".'
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    - name: Sync website
+      shell: bash
+      env:
+        WEBSITE_URL: ${{ inputs.url }}
+        WEBSITE_INCLUDE: ${{ inputs.include }}
+        WEBSITE_OUT_DIR: ${{ inputs.directory }}
+        WEBSITE_MAX_PAGES: ${{ inputs.max-pages }}
+      run: bun run website:sync
+
+    - name: Commit and push changes
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: "${{ inputs.commit-message || format('chore: sync {0}', inputs.url) }}"
+        paths: "${{ inputs.directory }}/**"
