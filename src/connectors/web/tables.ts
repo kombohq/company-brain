@@ -63,5 +63,6 @@ function isFirstTbody(element: Element): boolean {
 
 function cell(content: string, node: Node): string {
   const prefix = (node as Element).previousElementSibling ? " " : "| ";
-  return `${prefix}${content.replace(/\n/g, " ")} |`;
+  const text = content.replace(/\n/g, " ").replace(/\|/g, "\\|");
+  return `${prefix}${text} |`;
 }

@@ -27,6 +27,12 @@ describe("relPathForUrl", () => {
       "docs/getting-started.md",
     );
   });
+
+  test("keeps a crafted path inside the output dir", () => {
+    expect(relPathForUrl("https://h.com/a/%2e%2e/%2e%2e/etc")).toBe("etc.md");
+    expect(relPathForUrl("https://h.com/../..")).toBe("index.md");
+    expect(relPathForUrl("https://h.com/a//b")).toBe("a/b.md");
+  });
 });
 
 describe("makeLinkResolver", () => {

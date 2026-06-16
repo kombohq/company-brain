@@ -32,15 +32,13 @@ export function normalizeUrl(input: string, base?: string): string | null {
 
 /** Flat mirror of the URL path: "/" -> "index.md", "/docs/x" -> "docs/x.md". */
 export function relPathForUrl(url: string): string {
-  const path = new URL(url).pathname.replace(/^\/+|\/+$/g, "");
-  if (!path) {
-    return "index.md";
-  }
-  const safe = path
+  const segments = new URL(url).pathname
     .split("/")
     .map((segment) => decodeURIComponent(segment).replace(/[^\w.-]+/g, "-"))
-    .join("/");
-  return `${safe}.md`;
+    // Drop empty and dot-only segments ("", ".", "..") so a crafted same-host
+    // URL can't traverse out of the output directory.
+    .filter((segment) => segment && !/^\.+$/.test(segment));
+  return segments.length ? `${segments.join("/")}.md` : "index.md";
 }
 
 /**
@@ -96,8 +94,12 @@ async function httpGet(url: string): Promise<HttpResponse> {
   };
 }
 
+/** A sitemap's root element is <urlset>/<sitemapindex>; check the first real tag
+ * (skipping any <?xml?> declaration) so pages that merely mention those words in
+ * their body aren't mistaken for sitemaps. */
 function isSitemap(body: string): boolean {
-  return /<(?:urlset|sitemapindex)\b/i.test(body);
+  const firstTag = body.match(/<([a-zA-Z][\w:-]*)/)?.[1].toLowerCase();
+  return firstTag === "urlset" || firstTag === "sitemapindex";
 }
 
 /** Links out of a response: <loc> for sitemaps, <a href> for pages. */

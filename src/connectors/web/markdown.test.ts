@@ -62,6 +62,18 @@ describe("htmlToMarkdown", () => {
     `);
   });
 
+  test("escapes pipe characters inside cells", () => {
+    const html = `<main><table>
+      <thead><tr><th>Type</th><th>Value</th></tr></thead>
+      <tbody><tr><td>union</td><td>a | b</td></tr></tbody>
+    </table></main>`;
+    expect(htmlToMarkdown(html)).toMatchInlineSnapshot(`
+      "| Type | Value |
+      | --- | --- |
+      | union | a \\| b |"
+    `);
+  });
+
   test("keeps a headerless table as HTML", () => {
     const html = `<main><table><tbody>
       <tr><td>a</td><td>b</td></tr>
