@@ -89,6 +89,29 @@ ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync  # a different Gui
 
 `ZENDESK_SUBDOMAIN` is the `X` in `X.zendesk.com`. The reusable `./.github/actions/sync-zendesk` action syncs one Help Center per step; to mirror several, add more steps to `.github/workflows/sync-zendesk.yml` or copy the workflow, each pointing at a different subdomain and directory.
 
+### Pylon → `context/pylon/`
+
+Mirrors **closed** Pylon support tickets and their accounts into the context:
+
+- `tickets/<created-date>-TICKET-<number>.md` — one file per closed ticket. Frontmatter holds the metadata (`pylon_id`, `number`, `title`, `state`, `type`, timestamps, response/resolution metrics `first_response_*`/`resolution_*`/`number_of_touches`, `time_in_status_seconds`, `csat_score`/`csat_comment`, `source`, `slack`, `tags`, `requester`, `assignee_id`, `account_id`/`account`/`account_file`, `link`, any `custom_fields`); the body is the description and full conversation as Markdown, with a link to the account.
+- `accounts/<slug>-<id>.md` — one file per account (name, domain, type, `external_ids`, timestamps) listing the synced tickets that reference it.
+
+Listing every closed ticket is cheap, so ticket syncs are incremental on `updated_at`: only new or changed tickets have their messages refetched, and closed tickets aren't pruned. Accounts are few, so they're fully refetched each run and pruned when they disappear upstream.
+
+```bash
+PYLON_API_TOKEN=... bun run pylon:sync              # incremental
+PYLON_CREATED_AFTER=2026-06-14 bun run pylon:sync   # only tickets created after a date
+```
+
+Set `PYLON_CREATED_AFTER` (a date or RFC3339 timestamp) to only sync tickets created after it, which keeps the listing small. To force a full refetch, delete `context/pylon/tickets/` and run again.
+
+Setup:
+
+1. Create an API token at <https://app.usepylon.com/settings/api-tokens> with read access to issues and messages.
+2. Put it in `.env` as `PYLON_API_TOKEN` (local) and as a repo secret `PYLON_API_TOKEN` (for CI).
+
+CI runs `.github/workflows/sync-pylon.yml` on manual dispatch (uncomment the schedule to run it daily).
+
 ## Adding a new source
 
 See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
