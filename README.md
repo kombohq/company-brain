@@ -66,6 +66,18 @@ Setup:
 
 The reusable `./.github/actions/sync-repo` action syncs one repository per step (its own repository, secret, and directory). To mirror several repositories, add more steps to `.github/workflows/sync-repo.yml` or copy the workflow, each pointing at a different repository and secret.
 
+### Web → `context/<host>/`
+
+Mirrors web content (a marketing site, docs, a help center, ...) into the context as one markdown file per page (frontmatter records the source URL, body is the page's main content). The start URL can be a page or a sitemap (`…/sitemap.xml`, including sitemap indexes); both are crawled breadth-first within the host, so a fetched URL is either followed as a sitemap or saved as a page. An optional regex restricts which paths are synced, and pages that disappear upstream (gone or 404) are pruned, with a guardrail that skips pruning when a run discovers nothing.
+
+```bash
+WEB_URL=https://docs.example.com bun run web:sync
+WEB_URL=https://example.com WEB_INCLUDE='^/docs/' bun run web:sync
+WEB_URL=https://example.com/sitemap.xml WEB_OUT_DIR=context/example bun run web:sync
+```
+
+The reusable `./.github/actions/sync-web` action syncs one source per step (its own URL and directory). To mirror several sources, add more steps to `.github/workflows/sync-web.yml` or copy the workflow, each pointing at a different URL and directory.
+
 ## Adding a new source
 
 See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
