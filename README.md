@@ -89,6 +89,10 @@ ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync  # a different Gui
 
 `ZENDESK_SUBDOMAIN` is the `X` in `X.zendesk.com`. The reusable `./.github/actions/sync-zendesk` action syncs one Help Center per step; to mirror several, add more steps to `.github/workflows/sync-zendesk.yml` or copy the workflow, each pointing at a different subdomain and directory.
 
+## Running it with Cursor Cloud Agents
+
+To run this repo in the cloud and answer questions from Slack (no local machine needed), see [docs/cursor-cloud-agents.md](docs/cursor-cloud-agents.md).
+
 ## Adding a new source
 
 See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
