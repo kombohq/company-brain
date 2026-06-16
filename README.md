@@ -68,7 +68,7 @@ The reusable `./.github/actions/sync-repo` action syncs one repository per step 
 
 ## Adding a new source
 
-See `.cursor/skills/extend-agent-context/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI).
+See `.cursor/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). The skill is shared with Claude Code via the `.claude/skills` symlink.
 
 ## License
 
