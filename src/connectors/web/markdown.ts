@@ -6,15 +6,7 @@
  */
 
 import matter from "gray-matter";
-import TurndownService from "turndown";
-import { addTableRules } from "./tables.js";
-
-const turndown = new TurndownService({
-  headingStyle: "atx",
-  codeBlockStyle: "fenced",
-});
-turndown.keep(["pre", "code"]);
-addTableRules(turndown);
+import { htmlToMarkdown as toMarkdown } from "../../lib/html-to-markdown.js";
 
 /** Tags that never carry page content; dropped before conversion. */
 const CHROME =
@@ -71,8 +63,7 @@ export function htmlToMarkdown(
   if (resolveLink) {
     region = rewriteLinks(region, resolveLink);
   }
-  return turndown
-    .turndown(region)
+  return toMarkdown(region)
     .replace(/\[[\s\u200b]*\]\([^)]*\)/g, "")
     .replace(/^#{1,6}[ \t]*$/gm, "")
     .replace(/\n{3,}/g, "\n\n")

@@ -78,6 +78,17 @@ WEB_URL=https://example.com/sitemap.xml WEB_OUT_DIR=context/example bun run web:
 
 The reusable `./.github/actions/sync-web` action syncs one source per step (its own URL and directory). To mirror several sources, add more steps to `.github/workflows/sync-web.yml` or copy the workflow, each pointing at a different URL and directory.
 
+### Zendesk Help Center → `context/<subdomain>/`
+
+Mirrors a Zendesk Help Center's **published** articles into the context as one markdown file per article (`<article-id>.md`): YAML frontmatter holds the metadata (`zendesk_id`, `title`, `url`, `locale`, `section_id`, `labels`, timestamps), the body is the article content as Markdown. It uses the anonymous public API (no token), reads only published articles (drafts are skipped), and prunes articles that were unpublished or deleted, with a guardrail that skips pruning when a run discovers nothing.
+
+```bash
+ZENDESK_SUBDOMAIN=acme bun run zendesk:sync                    # mirror into context/acme
+ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync  # a different Guide locale
+```
+
+`ZENDESK_SUBDOMAIN` is the `X` in `X.zendesk.com`. The reusable `./.github/actions/sync-zendesk` action syncs one Help Center per step; to mirror several, add more steps to `.github/workflows/sync-zendesk.yml` or copy the workflow, each pointing at a different subdomain and directory.
+
 ## Adding a new source
 
 See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).

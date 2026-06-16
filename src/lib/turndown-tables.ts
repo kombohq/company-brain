@@ -1,8 +1,8 @@
 /**
  * Teach Turndown to emit GFM pipe tables. The built-in handling drops <table>
- * markup and dumps the cells as a flat list, which is unreadable for the dense
- * reference tables on docs pages. A table only maps cleanly when its first row
- * is a header (pipe tables require one), so headerless tables are kept as HTML.
+ * markup and dumps the cells as a flat list, which is unreadable for dense
+ * reference tables. A table only maps cleanly when its first row is a header
+ * (pipe tables require one), so headerless tables are kept as HTML.
  */
 import type TurndownService from "turndown";
 
