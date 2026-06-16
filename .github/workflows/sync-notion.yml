@@ -2,14 +2,20 @@
 # and "Read user information including email addresses" capabilities). Only pages and
 # databases shared with the integration are synced. See .env.example for setup.
 #
+# This workflow syncs one Notion integration via the reusable ./.github/actions/sync-notion
+# action. To sync more integrations, either add another step below or copy this file; in
+# each case point the step at a different secret and directory, and give each workflow its
+# own concurrency group.
+#
 # Note: this template git-ignores context/, so the commit step is a no-op here. In a
 # fork that wants to commit synced data, remove context/ from .gitignore.
 name: Sync Notion
 
 on:
-  schedule:
-    # 03:30 UTC daily.
-    - cron: "30 3 * * *"
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 03:30 UTC daily.
+  #   - cron: "30 3 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -21,7 +27,7 @@ on:
         default: incremental
 
 concurrency:
-  group: ${{ github.repository }}-context-sync
+  group: ${{ github.repository }}-context-sync-notion
   cancel-in-progress: false
 
 jobs:
@@ -34,39 +40,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: ./.github/actions/sync-notion
         with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      # continue-on-error so a partial sync (e.g. a Notion timeout) still commits
-      # the pages it wrote; the next run resumes from there. The failure is
-      # re-surfaced after the commit.
-      - name: Sync Notion
-        id: sync
-        continue-on-error: true
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: |
-          set -euo pipefail
-          MODE="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || 'incremental' }}"
-          if [ "$MODE" = "full" ]; then
-            bun run notion:sync full
-          else
-            bun run notion:sync
-          fi
-
-      - name: Commit and push changes
-        if: ${{ !cancelled() }}
-        uses: ./.github/actions/commit-and-push
-        with:
-          message: "chore: sync Notion"
-          paths: "context/notion/**"
-
-      - name: Surface sync failure
-        if: ${{ steps.sync.outcome == 'failure' }}
-        run: |
-          echo "Sync step failed; any pages synced before the failure were committed." >&2
-          exit 1
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          directory: context/notion
+          mode: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || 'incremental' }}

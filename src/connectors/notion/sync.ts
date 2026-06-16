@@ -12,7 +12,7 @@
  */
 
 import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
-import { dirname, join, posix, relative, sep } from "path";
+import { dirname, join, posix, relative, resolve, sep } from "path";
 import { processParallel } from "../../lib/process-parallel.js";
 import { contextDir } from "../../lib/paths.js";
 import { NotionSyncClient, type NotionNode } from "./notion-client.js";
@@ -24,7 +24,11 @@ import {
   serializePage,
 } from "./markdown.js";
 
-const OUT_DIR = contextDir("notion");
+// Defaults to context/notion; NOTION_OUT_DIR lets one workflow per integration
+// sync into its own directory.
+const OUT_DIR = process.env.NOTION_OUT_DIR
+  ? resolve(process.env.NOTION_OUT_DIR)
+  : contextDir("notion");
 const FETCH_CONCURRENCY = 3;
 
 type DiskEntry = { relPath: string; lastEditedTime: string };
