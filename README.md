@@ -8,7 +8,7 @@ The idea is simple: instead of giving an agent a pile of MCP servers and hoping 
 
 - Each **data source** has a small sync script under `src/<source>/` that fetches data and writes it into a top-level folder as raw JSON next to agent-friendly Markdown.
 - A **GitHub Actions** workflow runs each sync on a schedule and commits the result back to the repo.
-- A Cursor agent reads `.cursor/rules/` and `.cursor/skills/` to learn what's in the repo and how to search it.
+- An AI agent reads `AGENTS.md` and the skills under `.agents/skills/` to learn what's in the repo and how to search it.
 
 Everything runs on [Bun](https://bun.sh). TypeScript scripts, no build step.
 
@@ -68,7 +68,7 @@ The reusable `./.github/actions/sync-repo` action syncs one repository per step 
 
 ## Adding a new source
 
-See `.cursor/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). The skill is shared with Claude Code via the `.claude/skills` symlink.
+See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
 
 ## License
 
