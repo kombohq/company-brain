@@ -1,3 +1,7 @@
+colors: false
+output:
+  - failure
+
 pre-commit:
   commands:
     no-context:
