@@ -24,8 +24,21 @@ runs:
         INPUT_MESSAGE: ${{ inputs.message }}
         INPUT_PATHS: ${{ inputs.paths }}
         INPUT_BRANCH: ${{ inputs.branch }}
+        REPO_PRIVATE: ${{ github.event.repository.private }}
+        REPO_NAME: ${{ github.repository }}
       run: |
         set -euo pipefail
+
+        if [ "${REPO_NAME:-}" = "kombohq/company-brain" ]; then
+          echo "This is the public template (kombohq/company-brain); refusing to self-commit synced data." >&2
+          exit 1
+        fi
+
+        if [ "${REPO_PRIVATE:-}" = "false" ]; then
+          echo "Repository is public; refusing to auto-commit synced data." >&2
+          exit 1
+        fi
+
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
 
