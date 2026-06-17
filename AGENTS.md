@@ -6,7 +6,12 @@ Runs on [Bun](https://bun.sh): TypeScript, no build step.
 
 ## Layout
 
-- `src/connectors/<source>/` — one connector per data source, entry point `sync.ts`. Existing: `notion`, `repo`.
+- `src/connectors/<source>/` — one connector per data source, entry point `sync.ts`. Existing: `notion`, `repo`, `web`, `zendesk`.
 - `src/lib/` — shared helpers
 - `context/<source>/` — synced output, committed to the repo so agents have durable context.
-- `.github/` — per-source sync action + scheduled workflow (adjust them to make it sync actual data)
+- `.github/` — per-source sync action + scheduled workflow
+- `.agents/skills/` — skills for common tasks: `add-connector`, `setup-connector`
+
+## Connector templates
+
+The canonical connector templates live at https://github.com/kombohq/company-brain/tree/main/src/connectors/. Before building a new connector from scratch, check there for the latest patterns.

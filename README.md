@@ -4,9 +4,11 @@ A long-term **sync hub** that checks your company's data sources into Git as pla
 
 The idea is simple: instead of giving an agent a pile of MCP servers and hoping it searches them well, you **pull the data into the repo as Markdown + JSON** and let the agent do what it's good at, reading files, running `grep`, and following links. It scales to hundreds of files, finds far more relevant context, and is easy to inspect and reason about.
 
+**New here?** See [docs/getting-started.md](docs/getting-started.md).
+
 ## How it works
 
-- Each **data source** has a small sync script under `src/<source>/` that fetches data and writes it into a top-level folder as raw JSON next to agent-friendly Markdown.
+- Each **data source** has a small sync script under `src/connectors/<source>/` that fetches data and writes it into `context/<source>/` as raw JSON next to agent-friendly Markdown.
 - A **GitHub Actions** workflow runs each sync on a schedule and commits the result back to the repo.
 - An AI agent reads `AGENTS.md` and the skills under `.agents/skills/` to learn what's in the repo and how to search it.
 
@@ -93,9 +95,13 @@ ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync  # a different Gui
 
 To run this repo in the cloud and answer questions from Slack (no local machine needed), see [docs/cursor-cloud-agents.md](docs/cursor-cloud-agents.md).
 
-## Adding a new source
+## Adding or configuring sources
 
-See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
+To **enable an existing connector** (credentials, secrets, schedule): use `.agents/skills/setup-connector/SKILL.md` with your coding agent.
+
+To **add a connector for a new data source**: use `.agents/skills/add-connector/SKILL.md` (covers code layout, CI wiring, incremental sync, cross-linking, and the full checklist).
+
+Skills in `.agents/skills/` are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
 
 ## Local development
 
