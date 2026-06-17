@@ -1,8 +1,20 @@
-# company-brain
+# Company Brain Template
 
-A long-term **sync hub** that checks your company's data sources into Git as plain, searchable files, so an AI agent (e.g. a Cursor agent) has durable, greppable context about your business.
+This repository is a template for a company brain that you can get up and running in less than 20 minutes and use without introducing any new services. This runs entirely on the tools you already use.
 
-The idea is simple: instead of giving an agent a pile of MCP servers and hoping it searches them well, you **pull the data into the repo as Markdown + JSON** and let the agent do what it's good at, reading files, running `grep`, and following links. It scales to hundreds of files, finds far more relevant context, and is easy to inspect and reason about.
+### Appraoch
+
+Use this repository as a template and manage it in your own GitHub organization or in your private GitHub account. The repository synchronizes data from the tools that you use as markdown files into this repository, so you can have a coding agent navigate the files and do knowledge work for you.
+
+The idea is simple: instead of giving an agent a pile of MCP servers and hoping it searches them well, you **pull the data into the repo as Markdown + JSON** and let the agent do what it's good at, reading files, running `grep`, and following links. It scales to thousands of files, finds far more relevant context, and is easy to inspect and reason about.
+
+### Benefits
+
+The approach that this takes is deliberately simple, and that's what makes it powerful.
+
+- No new service needed. It only uses the tools you already use (Cursor/Claude and GitHub).
+- Get your own company brain up and running in under 20 minutes.
+- The files are the source of truth. No database schema to manage: your main branch is the source of truth, changing the way you sync data takes no effort.
 
 **New here?** See [docs/getting-started.md](docs/getting-started.md).
 
@@ -36,7 +48,7 @@ Mirrors the Notion pages and databases shared with an internal integration. Each
 
 Setup:
 
-1. Create an internal integration at <https://www.notion.com/my-integrations> with the **Read content** and **Read user information including email addresses** capabilities.
+1. Create an internal integration at [https://www.notion.com/my-integrations](https://www.notion.com/my-integrations) with the **Read content** and **Read user information including email addresses** capabilities.
 2. Share the top-level pages/databases you want synced with the integration.
 3. Put the token in `.env` as `NOTION_TOKEN` (local) and as a repo secret `NOTION_TOKEN` (for CI).
 
@@ -58,12 +70,14 @@ REPO_URL=owner/name REPO_REF=prod REPO_OUT_DIR=context/foo bun run repo:sync
 
 Setup:
 
-1. Public repositories need no token. For a private repository, create a **fine-grained** personal access token at <https://github.com/settings/personal-access-tokens/new>.
+1. Public repositories need no token. For a private repository, create a **fine-grained** personal access token at [https://github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new).
 2. Give it the **minimal** access it needs and nothing more:
-   - **Resource owner**: the org/user that owns the source repo.
-   - **Repository access**: _Only select repositories_ → pick just the source repo.
-   - **Repository permissions**: _Contents_ → **Read-only** (fine-grained tokens always add the required _Metadata: Read-only_ automatically; leave everything else as _No access_).
-   - Set the shortest expiration you're comfortable with.
+
+- **Resource owner**: the org/user that owns the source repo.
+- **Repository access**: _Only select repositories_ → pick just the source repo.
+- **Repository permissions**: _Contents_ → **Read-only** (fine-grained tokens always add the required _Metadata: Read-only_ automatically; leave everything else as _No access_).
+- Set the shortest expiration you're comfortable with.
+
 3. Add the token as a repo secret (e.g. `EXAMPLE_REPO_TOKEN`) and reference it from the workflow step.
 
 The reusable `./.github/actions/sync-repo` action syncs one repository per step (its own repository, secret, and directory). To mirror several repositories, add more steps to `.github/workflows/sync-repo.yml` or copy the workflow, each pointing at a different repository and secret.
