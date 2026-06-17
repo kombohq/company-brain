@@ -1,11 +1,10 @@
 /** Account-side of the sync: write one file per account, prune ones that vanish. */
 
-import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises";
+import { mkdir, readdir, rm, writeFile } from "fs/promises";
 import { join } from "path";
 import { ACCOUNTS_DIR } from "./config.js";
 import {
   accountFileName,
-  parseAccountId,
   serializeAccount,
   type TicketLink,
 } from "./markdown.js";
@@ -46,12 +45,12 @@ export async function writeAccounts(
   return accounts.length;
 }
 
-/** Delete account files whose account no longer exists upstream (skipped if none were fetched). */
+/** Delete account files that don't correspond to any current upstream account (skipped if none were fetched). */
 export async function pruneAccounts(accounts: PylonAccount[]): Promise<number> {
   if (accounts.length === 0) {
     return 0;
   }
-  const keep = new Set(accounts.map((a) => a.id));
+  const keepFileNames = new Set(accounts.map((a) => accountFileName(a)));
   let entries;
   try {
     entries = await readdir(ACCOUNTS_DIR, { withFileTypes: true });
@@ -63,10 +62,7 @@ export async function pruneAccounts(accounts: PylonAccount[]): Promise<number> {
     if (!entry.isFile() || !entry.name.endsWith(".md")) {
       continue;
     }
-    const id = parseAccountId(
-      await readFile(join(ACCOUNTS_DIR, entry.name), "utf-8"),
-    );
-    if (id && !keep.has(id)) {
+    if (!keepFileNames.has(entry.name)) {
       await rm(join(ACCOUNTS_DIR, entry.name), { force: true });
       deleted += 1;
     }
