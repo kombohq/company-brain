@@ -2,6 +2,7 @@ node_modules/
 .env
 .env.local
 *.log
+context-dev/
 
 # macOS system files
 .DS_Store
