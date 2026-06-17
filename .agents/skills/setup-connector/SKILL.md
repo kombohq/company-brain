@@ -13,22 +13,13 @@ This skill covers **enabling a connector that already exists** in `src/connector
 
 ## 1. Identify the connector
 
-Existing connectors and their scripts:
-
-| Source    | Script                 | Output                 |
-| --------- | ---------------------- | ---------------------- |
-| `notion`  | `bun run notion:sync`  | `context/notion/`      |
-| `repo`    | `bun run repo:sync`    | `context/<name>/`      |
-| `web`     | `bun run web:sync`     | `context/<host>/`      |
-| `zendesk` | `bun run zendesk:sync` | `context/<subdomain>/` |
-
-If the user hasn't specified a connector, ask which data source they want to enable.
+Check `src/connectors/` to see which connectors are available in this repo. Also check the canonical template at https://github.com/kombohq/company-brain/tree/main/src/connectors/ - a newer connector for the data source the user wants may already exist there and can be pulled in before building anything from scratch.
 
 ## 2. Find the required credentials
 
 Read `.env.example` for the connector's env vars. Each var has a comment pointing to where credentials are created and what permissions are needed.
 
-Copy `.env.example` to `.env` (if it doesn't exist yet) and fill in the relevant vars. Ask the user for the credential values.
+Copy `.env.example` to `.env`. Ask the user for the credential values.
 
 ## 3. Add GitHub Actions secrets
 
@@ -38,24 +29,19 @@ Find the exact secret names in `.github/workflows/sync-<source>.yml` - look for 
 
 Direct the user to: `https://github.com/<owner>/<repo>/settings/secrets/actions`
 
-## 4. Enable the CI schedule
+## 4. Configure the CI workflow
 
-Open `.github/workflows/sync-<source>.yml` and uncomment the `schedule:` block:
+The workflow files under `.github/workflows/` are templates. Before enabling them:
 
-```yaml
-on:
-  schedule:
-    - cron: "30 3 * * *" # uncomment this
-  workflow_dispatch:
-```
+**Rename and describe the workflow.** Update the `name:` field at the top to reflect what it actually syncs (e.g. `Sync Public docs` instead of `Sync Web`). This makes the Actions tab readable when multiple workflows are running.
 
-Adjust the cron expression if needed (times are UTC). Typical cadences:
+**Enable the schedule.** Uncomment the `schedule:` block and set a cron expression that fits how often the source changes (times are UTC).
 
-- Fast-moving sources (tickets, Slack): every hour or every few hours
-- Internal wikis (Notion): daily
-- Rarely-changing sources (docs site, Help Center): weekly
+**Stagger schedules across connectors.** When multiple workflows run at the same time, the commit-and-push step serializes via rebase, adding latency and noise. Spread cron times.
 
-Commit and push the workflow change.
+**Duplicate for multiple instances.** If the same connector should sync more than one source (e.g. two different repos, or two Zendesk subdomains), copy the workflow file and give each copy its own name, concurrency group, and schedule slot. Each step inside can target a different secret and output directory.
+
+Commit and push the workflow changes.
 
 ## 5. Run locally to verify
 
@@ -65,9 +51,34 @@ Before relying on CI, do a local smoke run:
 bun run <source>:sync
 ```
 
-Check that files appear under `context/<source>/` and look correct. Fix any credential or config errors before enabling CI.
+If `CONTEXT_ROOT=context-dev` is set in `.env`, output lands in `context-dev/<source>/` instead of `context/<source>/` - that's expected for local runs.
 
-## 6. Optional: customize the connector
+Read a sample of the synced files and verify they look right: frontmatter fields are populated, content is readable, links resolve, and there's no obviously missing or garbled data. Fix any credential or config errors before moving on.
+
+## 6. Verify CI works
+
+Ask the user to push the changes to GitHub and then trigger the workflow manually from the Actions tab (`Run workflow`). Wait for them to confirm it completed, then ask whether it succeeded and whether a new commit appeared on `main` with the synced files.
+
+## 7. Update AGENTS.md
+
+After a successful sync, launch a sub-agent to explore the synced folder before writing anything. Give it this task:
+
+> Explore `context/<source>/`. Understand the folder structure, what kinds of files were created, and how they're named. Read a representative sample of files and note: what frontmatter fields are present and which ones are useful for filtering or identifying records (e.g. `status`, `id`, `url`, `tags`), what the typical file structure looks like, which files or subdirectories look most important, and whether there are any useful glob patterns for targeting specific subsets. Then summarize what's in there and what navigation hints would help an agent work with this folder effectively.
+
+Based on the sub-agent's findings, draft a proposed AGENTS.md entry and present it to the user for review. Ask if anything should be added, changed, or removed.
+
+Then write the AGENTS.md entry based on both the sub-agent's findings and the user's input. A good entry names the folder, what it contains, and agent-facing navigation hints:
+
+```
+- `context/notion/` — internal wiki: product specs, runbooks, decision logs
+  - `path/to/some/page.md` — important product context
+- `context/acme-api.zendesk.com/` — Help Center articles; useful for answering support questions
+- `context/customers/` — one file per customer, joined from CRM + support tickets
+```
+
+Keep descriptions agent-facing: tell the agent what it will find there and when it's useful, not just what the connector does.
+
+## 8. Optional, later down the line: customize the connector
 
 Read `src/connectors/<source>/sync.ts` to understand what it currently does, then suggest the appropriate customization:
 
@@ -79,6 +90,6 @@ Read `src/connectors/<source>/sync.ts` to understand what it currently does, the
 
 **Crosslinks** - when writing Markdown, add relative paths to related files already in `context/`. Example: in a ticket file, add a link to `../customers/<id>.md`. This lets an agent navigate between resources without searching.
 
-**LLM enrichment** - after syncing raw data, run a convert step that calls an LLM to classify, summarize, or extract structured information. Add `@ai-sdk/anthropic` (or another provider) and write a `convert.ts` script that reads the raw JSON and rewrites the Markdown.
+**LLM enrichment** - after syncing raw data, run a convert step (for example with Cursor Automations) to classify, summarize, or extract structured information and push it to other places.
 
 If the customization involves joining another data source or adding a separate convert step, switch to the `add-connector` skill which covers the full pattern.

@@ -24,14 +24,15 @@ The short version:
 
 1. Copy `.env.example` to `.env` and fill in the vars for the connector you want.
 2. Add the same values as [Actions secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) in your repo (`Settings → Secrets and variables → Actions`).
-3. Uncomment the `schedule:` block in `.github/workflows/sync-<source>.yml`.
-4. Run locally to verify: `bun run <source>:sync`
+3. Have the agent uncomment the `schedule:` block in `.github/workflows/sync-<source>.yml`.
+4. Have the agent run it locally to verify: `bun run <source>:sync`
 
-As you add connectors, update `AGENTS.md` to describe what's in `context/` and what each folder contains. Agents read this file first to orient themselves. A good entry looks like:
+As you add connectors, have the agent update the `AGENTS.md` to describe what's in `context/` and what each folder contains. Agents read this file first to orient themselves. A good entry looks like:
 
 ```
 - `context/notion/` — internal wiki: product specs, runbooks, decision logs
-- `context/acme-api.zendesk.com/` — published Help Center articles
+  - `path/to/some/page.md` -> important product context
+- `context/acme-api.zendesk.com/` — find content on solving X from our helpcenter
 - `context/customers/` — one file per customer, joined from CRM + support tickets
 ```
 
