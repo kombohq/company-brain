@@ -1,0 +1,26 @@
+# Git repository connector
+
+Mirrors another Git repository into the context as plain files. The source is shallow-cloned, its `.git` is dropped, and files removed upstream are deleted, so the result is a clean snapshot you can grep and link to.
+
+Output: `context/<name>/`
+
+## Setup
+
+1. Public repositories need no token. For a private repository, create a **fine-grained** personal access token at <https://github.com/settings/personal-access-tokens/new>.
+2. Give it the minimal access it needs:
+   - **Resource owner**: the org/user that owns the source repo.
+   - **Repository access**: _Only select repositories_ → pick just the source repo.
+   - **Repository permissions**: _Contents_ → **Read-only** (leave everything else as _No access_).
+   - Set the shortest expiration you're comfortable with.
+3. Add the token as a repo secret (e.g. `EXAMPLE_REPO_TOKEN`) and reference it from the workflow step.
+
+## Running
+
+```bash
+REPO_URL=owner/name bun run repo:sync
+REPO_URL=owner/name REPO_REF=prod REPO_OUT_DIR=context/foo bun run repo:sync
+```
+
+The reusable `./.github/actions/sync-repo` action syncs one repository per step. To mirror several repositories, add more steps to `.github/workflows/sync-repo.yml` or copy the workflow, each pointing at a different repository and secret.
+
+CI: `.github/workflows/sync-repo.yml` — uncomment the `schedule:` block to enable automatic syncs.
