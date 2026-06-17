@@ -13,6 +13,7 @@
     "web:sync": "bun run src/connectors/web/sync.ts",
     "repo:sync": "bun run src/connectors/repo/sync.ts",
     "zendesk:sync": "bun run src/connectors/zendesk/sync.ts",
+    "granola:sync": "bun run src/connectors/granola/sync.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
