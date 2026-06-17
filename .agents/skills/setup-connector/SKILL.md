@@ -3,8 +3,8 @@ name: setup-connector
 description: >-
   Enable and configure an existing connector. Use when the user wants to start
   syncing a data source that already has a connector (Notion, web, repo,
-  Zendesk), set up credentials, enable the CI schedule, or customize filtering
-  and output for an existing connector.
+  Zendesk, Pylon, Granola), set up credentials, enable the CI schedule, or
+  customize filtering and output for an existing connector.
 ---
 
 # Set up an existing connector

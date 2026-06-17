@@ -1,6 +1,6 @@
 # Getting Started
 
-Work with a coding agent throughout. This repo has skills that teach agents how common tasks should be done - they don't need to figure things out from scratch. Just ask you agent about the thing you want to do.
+Work with a coding agent throughout. This repo has skills that teach agents how common tasks should be done - they don't need to figure things out from scratch. Just ask your agent about the thing you want to do.
 
 There are three steps to get started:
 
@@ -15,6 +15,12 @@ There are three steps to get started:
 Click "Use this template" on [kombohq/company-brain](https://github.com/kombohq/company-brain) to create a fresh copy under your org with no commit history.
 
 **Your repo must be private.** The auto-commit workflow refuses to run on public repos as a safety mechanism.
+
+Clone the repo locally and run:
+
+```bash
+bun install
+```
 
 ## 2. Sync data
 

@@ -4,11 +4,11 @@ This repository is a template for a company brain that you can get up and runnin
 
 **[Get started →](docs/getting-started.md)**
 
-### Appraoch
+### Approach
 
 Use this repository as a template and manage it in your own GitHub organization or in your private GitHub account. The repository synchronizes data from the tools that you use as markdown files into this repository, so you can have a coding agent navigate the files and do knowledge work for you.
 
-The idea is simple: instead of giving an agent a pile of MCP servers and hoping it searches them well, you **pull the data into the repo as Markdown + JSON** and let the agent do what it's good at, reading files, running `grep`, and following links. It scales to thousands of files, finds far more relevant context, and is easy to inspect and reason about.
+The idea is simple: instead of giving an agent a pile of MCP servers and hoping it searches them well, you **pull the data into the repo as Markdown** and let the agent do what it's good at, reading files, running `grep`, and following links. It scales to thousands of files, finds far more relevant context, and is easy to inspect and reason about.
 
 ### Benefits
 
@@ -28,7 +28,7 @@ What we do at Kombo:
 
 **Crosslink** - add relative links between related files so an agent can navigate between them without searching. A customer file that links to every related ticket; a ticket that links back to the customer.
 
-**Infer** - use an LLM (e.g. in a Cursor Automation) to manage data on a recurring schedule: classify tickets, score conversations, extract structured data from unstructured text, or install MCPs to push tickets tickets into Linear, manage TODOs from meetings, or similar.
+**Infer** - use an LLM (e.g. in a Cursor Automation) to manage data on a recurring schedule: classify tickets, score conversations, extract structured data from unstructured text, or install MCPs to push tickets into Linear, manage TODOs from meetings, or similar.
 
 For a production example, see `src/customers/sync.ts` in [kombohq/agent-context](https://github.com/kombohq/agent-context).
 
@@ -57,6 +57,7 @@ Copy `.env.example` to `.env` and fill in the credentials for the sources you en
 All synced data lives under `context/<source>/`. Detailed setup instructions for each connector:
 
 - [Notion](docs/connectors/notion.md)
+- [Granola](docs/connectors/granola.md)
 - [Git repository](docs/connectors/repo.md)
 - [Web crawler](docs/connectors/web.md)
 - [Zendesk Help Center](docs/connectors/zendesk.md)
