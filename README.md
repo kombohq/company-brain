@@ -114,6 +114,17 @@ To **add a connector for a new data source**: use `.agents/skills/add-connector/
 
 Skills in `.agents/skills/` are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
 
+## Local development
+
+Set `CONTEXT_ROOT=context-dev` in your `.env` so sync output lands in a gitignored directory instead of the committed `context/` folder:
+
+```bash
+# .env
+CONTEXT_ROOT=context-dev
+```
+
+All connectors pick this up automatically. Leave it unset in CI so production syncs go to `context/` as normal.
+
 ## License
 
 [MIT](LICENSE)
