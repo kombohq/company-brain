@@ -5,9 +5,6 @@
 #
 # To sync more sources, either add another step below or copy this file; in each
 # case point the step at a different URL and directory.
-#
-# Note: this template git-ignores context/, so the commit step is a no-op here. In
-# a fork that wants to commit synced data, remove context/ from .gitignore.
 name: Sync web
 
 on:

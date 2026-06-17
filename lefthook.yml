@@ -1,5 +1,19 @@
+colors: false
+output:
+  - failure
+
 pre-commit:
   commands:
+    no-context:
+      glob: "{context,context-dev}/**"
+      run: |
+        case "$(git remote get-url origin 2>/dev/null)" in
+          *kombohq/company-brain*)
+            echo "Refusing to commit context/ on the public template repo (kombohq/company-brain)." >&2
+            echo "Staged: {staged_files}" >&2
+            exit 1
+            ;;
+        esac
     format:
       glob: "*.{js,ts,tsx,json,jsonc,yaml,yml,md,css,html}"
       run: bunx prettier --write {staged_files}

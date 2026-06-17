@@ -112,9 +112,24 @@ Setup:
 
 CI runs `.github/workflows/sync-pylon.yml` on manual dispatch (uncomment the schedule to run it daily).
 
+## Running it with Cursor Cloud Agents
+
+To run this repo in the cloud and answer questions from Slack (no local machine needed), see [docs/cursor-cloud-agents.md](docs/cursor-cloud-agents.md).
+
 ## Adding a new source
 
 See `.agents/skills/add-connector/SKILL.md` for the pattern (where code goes, naming, the commit-and-push action, and the checklist for wiring a new source into CI). Skills live in `.agents/skills/` and are shared with each agent tool via a committed symlink (`.claude/skills`, `.codex/skills`, `.cursor/skills`).
+
+## Local development
+
+Set `CONTEXT_ROOT=context-dev` in your `.env` so sync output lands in a gitignored directory instead of the committed `context/` folder:
+
+```bash
+# .env
+CONTEXT_ROOT=context-dev
+```
+
+All connectors pick this up automatically. Leave it unset in CI so production syncs go to `context/` as normal.
 
 ## License
 

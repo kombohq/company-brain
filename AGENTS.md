@@ -8,5 +8,5 @@ Runs on [Bun](https://bun.sh): TypeScript, no build step.
 
 - `src/connectors/<source>/` — one connector per data source, entry point `sync.ts`. Existing: `notion`, `repo`.
 - `src/lib/` — shared helpers
-- `context/<source>/` — synced output (gitignored in this template, remove it from gitignore when using it).
+- `context/<source>/` — synced output, committed to the repo so agents have durable context.
 - `.github/` — per-source sync action + scheduled workflow (adjust them to make it sync actual data)

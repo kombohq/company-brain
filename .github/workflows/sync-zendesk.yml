@@ -4,9 +4,6 @@
 #
 # To sync more Help Centers, either add another step below or copy this file; in
 # each case point the step at a different subdomain and directory.
-#
-# Note: this template git-ignores context/, so the commit step is a no-op here. In
-# a fork that wants to commit synced data, remove context/ from .gitignore.
 name: Sync Zendesk
 
 on:
