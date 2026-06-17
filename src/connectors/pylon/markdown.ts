@@ -37,7 +37,6 @@ function shortId(id: string): string {
 const UNSTABLE_IMAGE =
   /!\[([^\]]*)\]\((?:https?:)?\/\/[^)]*(?:usepylon\.com|[?&](?:Signature|Expires)=)[^)]*\)/g;
 
-/** Convert HTML to markdown, then swap expiring image URLs for their stable name. */
 function mdFromHtml(html: string): string {
   return htmlToMarkdown(html).replace(UNSTABLE_IMAGE, (_full, alt) =>
     alt ? `[image: ${alt}]` : "[image]",

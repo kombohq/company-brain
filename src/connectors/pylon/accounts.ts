@@ -31,7 +31,6 @@ function ticketLinksByAccount(
   return byAccount;
 }
 
-/** Write one account file per account, listing the tickets that reference it. */
 export async function writeAccounts(
   accounts: PylonAccount[],
   tickets: Map<string, TicketMeta>,
