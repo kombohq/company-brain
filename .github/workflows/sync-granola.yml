@@ -1,0 +1,35 @@
+# Requires repo secret GRANOLA_API_KEY (created in the Granola desktop app at
+# Settings → Connectors → API keys with Personal notes and/or Public notes scope).
+# A Business or Enterprise Granola plan is required to create API keys.
+#
+# This workflow syncs one Granola account via the reusable ./.github/actions/sync-granola
+# action. To sync more accounts, either add another step below or copy this file; in each
+# case point the step at a different secret and directory, and give each workflow its own
+# concurrency group.
+name: Sync Granola
+
+on:
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 04:00 UTC daily.
+  #   - cron: "0 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-context-sync-granola
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/sync-granola
+        with:
+          granola-api-key: ${{ secrets.GRANOLA_API_KEY }}
+          directory: context/granola

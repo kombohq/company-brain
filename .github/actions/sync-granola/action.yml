@@ -1,0 +1,54 @@
+name: Sync Granola
+description: >-
+  Mirror Granola meeting notes into the given directory as markdown and commit
+  the result. Requires a Granola API key with Personal notes and/or Public notes
+  scope (Business or Enterprise plan).
+
+inputs:
+  granola-api-key:
+    description: Granola API key created at Settings → Connectors → API keys.
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/granola").
+    required: true
+  commit-message:
+    description: Commit message for the synced changes.
+    required: false
+    default: "chore: sync Granola"
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    # continue-on-error so a partial sync (e.g. an API timeout mid-run) still commits
+    # the notes it wrote; the next run resumes from there. The failure is re-surfaced
+    # after the commit.
+    - name: Sync Granola
+      id: sync
+      shell: bash
+      continue-on-error: true
+      env:
+        GRANOLA_API_KEY: ${{ inputs.granola-api-key }}
+        GRANOLA_OUT_DIR: ${{ inputs.directory }}
+      run: bun run granola:sync
+
+    - name: Commit and push changes
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: ${{ inputs.commit-message }}
+        paths: "${{ inputs.directory }}/**"
+
+    - name: Surface sync failure
+      if: ${{ steps.sync.outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "Sync step failed; any notes synced before the failure were committed." >&2
+        exit 1
