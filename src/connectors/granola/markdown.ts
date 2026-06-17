@@ -30,11 +30,15 @@ export function serializeNote(note: Note): string {
   const parts: string[] = [];
 
   if (note.transcript && note.transcript.length > 0) {
-    const lines = ["## Transcript"];
+    const hasDiarization = note.transcript.some(
+      (s) => s.speaker.diarization_label,
+    );
+    const disclaimer = hasDiarization
+      ? `> Speaker labels (Speaker A, B, …) are assigned by who spoke first in this conversation and are not consistent across meetings.`
+      : `> "microphone" = audio captured from the local mic; "speaker" = audio from speakers/headphones. Multiple people may talk through either channel — do not assume who is who.`;
+    const lines = ["## Transcript", "", disclaimer];
     for (const seg of note.transcript) {
-      const label =
-        seg.speaker.diarization_label ??
-        (seg.speaker.source === "microphone" ? "You" : "Them");
+      const label = seg.speaker.diarization_label ?? seg.speaker.source;
       lines.push(`\n**${label}:** ${seg.text}`);
     }
     parts.push(lines.join("\n"));
