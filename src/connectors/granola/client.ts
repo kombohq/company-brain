@@ -100,6 +100,11 @@ export class GranolaClient {
       for (const note of page.notes) {
         yield note;
       }
+      if (page.hasMore && !page.cursor) {
+        throw new Error(
+          "Granola API returned hasMore=true with no cursor; cannot continue pagination",
+        );
+      }
       cursor = page.hasMore ? page.cursor : null;
     } while (cursor !== null);
   }
