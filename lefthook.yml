@@ -6,6 +6,7 @@ pre-commit:
   commands:
     no-context:
       glob: "{context,context-dev}/**"
+      exclude: "**/.gitkeep"
       run: |
         case "$(git remote get-url origin 2>/dev/null)" in
           *kombohq/company-brain*)
