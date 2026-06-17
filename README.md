@@ -18,6 +18,20 @@ The approach that this takes is deliberately simple, and that's what makes it po
 - Get your own company brain up and running in under 20 minutes.
 - The files are the source of truth. No database schema to manage: your main branch is the source of truth, changing the way you sync data takes no effort.
 
+## How to use this repo
+
+What we do at Kombo:
+
+**Filter** - only sync what's relevant. Skip noise so the agent isn't distracted by it.
+
+**Merge** - join data from multiple sources in a post-processing script. A single `customers/` folder that combines CRM data, support tickets, and call recordings is more useful than three separate folders.
+
+**Crosslink** - add relative links between related files so an agent can navigate between them without searching. A customer file that links to every related ticket; a ticket that links back to the customer.
+
+**Infer** - use an LLM (e.g. in a Cursor Automation) to manage data on a recurring schedule: classify tickets, score conversations, extract structured data from unstructured text, or install MCPs to push tickets tickets into Linear, manage TODOs from meetings, or similar.
+
+For a production example, see `src/customers/sync.ts` in [kombohq/agent-context](https://github.com/kombohq/agent-context).
+
 ## How it works
 
 - Each **data source** has a small sync script under `src/connectors/<source>/` that fetches data and writes it into `context/<source>/` as raw JSON next to agent-friendly Markdown.
