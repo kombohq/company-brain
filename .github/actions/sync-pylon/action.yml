@@ -1,0 +1,42 @@
+name: Sync Pylon
+description: >-
+  Mirror closed Pylon support tickets into the given directory as markdown and
+  commit the result. Use one step (or one workflow) per Pylon workspace, each
+  passing its own token and directory.
+
+inputs:
+  token:
+    description: Pylon API token (https://app.usepylon.com/settings/api-tokens).
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/pylon").
+    required: false
+    default: context/pylon
+  commit-message:
+    description: 'Commit message for the synced changes. Defaults to "chore: sync pylon".'
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    - name: Sync Pylon
+      shell: bash
+      env:
+        PYLON_API_TOKEN: ${{ inputs.token }}
+        PYLON_OUT_DIR: ${{ inputs.directory }}
+      run: bun run pylon:sync
+
+    - name: Commit and push changes
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: "${{ inputs.commit-message || 'chore: sync pylon' }}"
+        paths: "${{ inputs.directory }}/**"

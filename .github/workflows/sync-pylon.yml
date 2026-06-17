@@ -1,0 +1,36 @@
+# Mirrors closed Pylon support tickets into context/pylon/ via the reusable
+# ./.github/actions/sync-pylon action. The Pylon API token is passed as a repo
+# secret (PYLON_API_TOKEN).
+#
+# To sync more Pylon workspaces, either add another step below or copy this file;
+# in each case point the step at a different token and directory.
+#
+# Note: this template git-ignores context/, so the commit step is a no-op here. In
+# a fork that wants to commit synced data, remove context/ from .gitignore.
+name: Sync Pylon
+
+on:
+  # Uncomment to enable automatic daily sync.
+  # schedule:
+  #   # 04:15 UTC daily.
+  #   - cron: "15 4 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-context-sync-pylon
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/sync-pylon
+        with:
+          token: ${{ secrets.PYLON_API_TOKEN }}
+          directory: context/pylon
