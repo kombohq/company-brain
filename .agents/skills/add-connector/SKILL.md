@@ -4,7 +4,7 @@ description: >-
   Add or change a connector that syncs a new data source into this repo's
   context. Use when the user wants to mirror another source (an API, a website,
   a database, a repo) into context/, add a sync script, wire package.json, or
-  set up the CI workflow, following the existing Notion / website / repo
+  set up the CI workflow, following the existing Notion / web / repo
   connectors.
 ---
 
@@ -16,7 +16,7 @@ This repo pulls **external data into `context/`** as plain files so an agent can
 
 - **Bun only.** Scripts run with `bun run …`; no build step, no npm/pnpm/yarn.
 - **Keep it lean.** Do the smallest thing that works. Add a dependency only when there's a concrete need, and never drag in tooling from other repos (no databases, queues, web frameworks) just because a similar connector elsewhere had them.
-- **Raw + derived artifacts.** Persist the raw structured dump (JSON) next to an agent-friendly derivation (Markdown). Record the source id/url in frontmatter so files can be linked back and pruned.
+- **Agent-friendly output.** Write Markdown with YAML frontmatter. Record the source id/url in frontmatter so files can be linked back and pruned.
 - **Deterministic output.** Writing the same upstream state must produce byte-identical files. Never write volatile metadata (timestamps like `fetched_at`, random ids); frontmatter should carry only durable identity (source id/url, title). Volatile fields create a huge diff on every run of the self-commit workflow.
 - **Cross-link the repo.** Context files should reference related files in the repo by **relative path** so the agent can navigate by following links. Rewrite upstream links to point at the synced files; when a target isn't synced, keep the full external URL.
 - **Incremental, prune only when needed.** Refetch only what changed. Deletion tracking (pruning files whose source disappeared upstream) isn't always needed, consider whether this source needs it and **ask the user if unsure**. When you do prune, **skip pruning when a run discovers nothing** so a transient outage can't wipe the mirror.
@@ -28,12 +28,12 @@ This repo pulls **external data into `context/`** as plain files so an agent can
 
 - One connector per directory: `src/connectors/<source>/`, entry point `sync.ts` (plus helpers like `discover.ts`, `markdown.ts` as needed).
 - Output paths come from `contextDir(name)` in `src/lib/paths.ts` → `context/<name>/`.
-- Configure the script through **env vars** read at the top of `sync.ts` (see `website/sync.ts` for the pattern: required vars throw, optional vars have defaults).
+- Configure the script through **env vars** read at the top of `sync.ts` (see `web/sync.ts` for the pattern: required vars throw, optional vars have defaults).
 
 Look at the existing connectors before writing a new one:
 
 - `src/connectors/notion/` — API mirror, incremental by `last_edited_time`, prunes unshared/deleted nodes.
-- `src/connectors/website/` — crawl/sitemap → one Markdown file per page, prunes by source URL.
+- `src/connectors/web/` — crawl/sitemap → one Markdown file per page, prunes by source URL.
 - `src/connectors/repo/` — shallow git clone of another repo, `.git` dropped.
 
 ## package.json
