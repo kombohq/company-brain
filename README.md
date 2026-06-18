@@ -67,8 +67,7 @@ All synced data lives under `context/<source>/`. Detailed setup instructions for
 
 - [Running with Cursor Cloud Agents](docs/cursor-cloud-agents.md) — recommended for shared team access in Slack
 - [Chatting with the repository via Claude Code](docs/claude-code-web.md) — per-user setup, works from browser or phone
-- [Security considerations](docs/security.md) — risks to understand before sharing a company brain with employees or customers
-- [Security considerations](docs/security.md) — what to think about before deploying a company brain
+- [Security considerations](docs/security.md) — what to weigh before sharing a company brain with employees or customers
 
 ## Adding a new source
 

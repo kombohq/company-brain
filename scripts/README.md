@@ -9,6 +9,9 @@ Maintainer tooling.
   release).
 - `tests/`: [bashunit](https://bashunit.com) tests for `release.sh` (pure-helper
   unit tests plus an end-to-end integration test against a throwaway repo).
+- `harden-package-managers.sh`: set a global minimum release age for bun / npm /
+  pnpm / yarn as a supply-chain guard. Runs on `bun install` via `postinstall`.
+  See [security considerations](../docs/security.md#supply-chain-attacks).
 
 ## Cutting a release
 

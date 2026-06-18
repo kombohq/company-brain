@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "postinstall": "bash scripts/harden-package-managers.bash || true",
+    "postinstall": "bash scripts/harden-package-managers.sh || true",
     "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "test": "bun test",

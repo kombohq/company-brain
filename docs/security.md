@@ -38,21 +38,27 @@ Having the agent operate in a shared Slack channel is a meaningful security laye
 
 It also has a non-security benefit: people learn from watching others interact with the agent and discover capabilities they would not have found on their own.
 
+### Treat credentials as the crown jewels
+
+Each connector authenticates to its upstream system with a token. Scope every token to the least privilege it needs (read-only wherever possible), store them as GitHub Actions secrets or in a local `.env` that is never committed, and rotate them if a sync environment is ever compromised. A leaked token is often more damaging than the synced data itself, because it grants live access to the source system rather than a point-in-time snapshot.
+
 ### Supply chain attacks
 
-A malicious package published to npm, runs with full access to the environment at sync time, including any secrets loaded from `.env`.
+A malicious package published to npm runs with full access to the environment at sync time, including any secrets loaded from `.env`.
 
-The most effective control is a minimum release age: refuse to install any package version that was published less than 5 days ago, giving the community time to detect and report malicious publishes before they reach you. Bun, npm, pnpm, and Yarn all support this natively; `scripts/harden-package-managers.bash` sets it globally on the developer's machine and runs automatically on `bun install` via the `postinstall` hook.
+The most effective control is a minimum release age: refuse to install any package version published less than 5 days ago, giving the community time to detect and report malicious publishes before they reach you. Recent versions of Bun, npm, pnpm, and Yarn all support this natively.
+
+Running `bun install` triggers `scripts/harden-package-managers.sh` (via the `postinstall` hook), which sets this minimum age for whichever of those package managers are installed. Note that it writes to your **global** config (`~/.bunfig.toml` and equivalents), so the protection deliberately applies machine-wide, not just to this repo. If you would rather configure this yourself, remove the `postinstall` entry from `package.json`.
 
 ## Risk cannot be zero
 
-Humans with access to sensitive internal knowledge also carry risk, they can be phished, manipulated, or act in bad faith. The goal is to reduce the risk to a level where exploitation costs more than it is worth, and where the most likely failure modes are visible, contained, and recoverable.
+Humans with access to sensitive internal knowledge also carry risk: they can be phished, manipulated, or act in bad faith. The goal is to reduce the risk to a level where exploitation costs more than it is worth, and where the most likely failure modes are visible, contained, and recoverable.
 
 ## What we do at Kombo
 
 We run a more restricted version where:
 
 - Network access is disabled at the sandbox level.
-- We are deliberate about what we sync, we do not put data in the repo that we would not share with all employees. We redact most PII before storing files.
-- The Cursor Automation is configured to a designated channel; all interactions go through that channel and are visible to the team
+- We are deliberate about what we sync: we do not put data in the repo that we would not share with all employees, and we redact most PII before storing files.
+- The Cursor Automation is configured to a designated channel; all interactions go through that channel and are visible to the team.
 - Only Kombo employees can interact with the agent.
