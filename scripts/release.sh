@@ -85,50 +85,84 @@ today="$(date +%F)"
 
 git rev-parse "$tag" >/dev/null 2>&1 && die "tag $tag already exists"
 
-# --- Guard: non-empty [Unreleased] ----------------------------------------
+# --- Inspect the changelog -------------------------------------------------
 
-unreleased_body="$(
-  awk '
-    /^## \[Unreleased\]/ { capture = 1; next }
+# Body under a given "## [heading...]" line (matched by prefix), up to the next
+# "## " heading.
+section_body() {
+  awk -v prefix="$1" '
+    index($0, prefix) == 1 { capture = 1; next }
     /^## / && capture { exit }
     capture { print }
   ' "$changelog"
-)"
+}
 
-if [[ -z "$(echo "$unreleased_body" | tr -d '[:space:]')" ]] && [[ "$allow_empty" != true ]]; then
-  die "[Unreleased] section is empty; add changelog entries or pass --allow-empty"
+has_content() { [[ -n "$(echo "$1" | tr -d '[:space:]')" ]]; }
+
+unreleased_body="$(section_body "## [Unreleased]")"
+
+# A section for this exact version may already exist (e.g. the backfilled
+# first release). If so, we tag it as-is instead of inserting a duplicate.
+existing_body="$(section_body "## [${next_version}]")"
+
+if has_content "$existing_body"; then
+  # Already-prepared section: reuse its body, do not rewrite the changelog.
+  rewrite_changelog=false
+  release_notes="$(echo "$existing_body" | sed '/^[[:space:]]*$/d')"
+  if has_content "$unreleased_body"; then
+    echo "note: [Unreleased] has entries but ## [$next_version] already exists;" \
+      "leaving [Unreleased] untouched for the next release." >&2
+  fi
+else
+  # Normal release: roll [Unreleased] into a new dated section.
+  if ! has_content "$unreleased_body" && [[ "$allow_empty" != true ]]; then
+    die "[Unreleased] section is empty; add changelog entries or pass --allow-empty"
+  fi
+  rewrite_changelog=true
+  release_notes="$(echo "$unreleased_body" | sed '/^[[:space:]]*$/d')"
 fi
+
+[[ -n "$release_notes" ]] || release_notes="Release $tag"
 
 echo "Releasing $current_version -> $next_version  (tag $tag, $today)"
 
 # --- Build the new changelog ----------------------------------------------
 
-new_changelog="$(
-  awk -v ver="$next_version" -v date="$today" '
-    /^## \[Unreleased\]/ {
-      print
-      print ""
-      print "## [" ver "] - " date
-      next
-    }
-    { print }
-  ' "$changelog"
-)"
+if [[ "$rewrite_changelog" == true ]]; then
+  new_changelog="$(
+    awk -v ver="$next_version" -v date="$today" '
+      /^## \[Unreleased\]/ {
+        print
+        print ""
+        print "## [" ver "] - " date
+        next
+      }
+      { print }
+    ' "$changelog"
+  )"
+fi
 
-# Release notes = the body of the just-cut version section.
-release_notes="$(echo "$unreleased_body" | sed '/^[[:space:]]*$/d')"
-[[ -n "$release_notes" ]] || release_notes="Release $tag"
+bump_pkg=false
+[[ "$current_version" != "$next_version" ]] && bump_pkg=true
 
 if [[ "$dry_run" == true ]]; then
   echo
   echo "--- DRY RUN; no changes will be made ---"
   echo
-  echo "package.json: version $current_version -> $next_version"
+  if [[ "$bump_pkg" == true ]]; then
+    echo "package.json: version $current_version -> $next_version"
+  else
+    echo "package.json: already at $next_version (no change)"
+  fi
   echo
-  echo "CHANGELOG.md after rewrite (top):"
-  echo "$new_changelog" | sed -n '1,30p'
+  if [[ "$rewrite_changelog" == true ]]; then
+    echo "CHANGELOG.md after rewrite (top):"
+    echo "$new_changelog" | sed -n '1,30p'
+  else
+    echo "CHANGELOG.md: ## [$next_version] already present (no change)"
+  fi
   echo
-  echo "git commit -m 'chore(release): $tag'"
+  echo "git commit -m 'chore(release): $tag'  (only if package.json/CHANGELOG changed)"
   echo "git tag $tag"
   echo "git push origin $default_branch --follow-tags"
   echo
@@ -139,17 +173,27 @@ fi
 
 # --- Apply -----------------------------------------------------------------
 
-node -e "
-  const fs = require('fs');
-  const p = JSON.parse(fs.readFileSync('$pkg', 'utf8'));
-  p.version = '$next_version';
-  fs.writeFileSync('$pkg', JSON.stringify(p, null, 2) + '\n');
-"
+if [[ "$bump_pkg" == true ]]; then
+  node -e "
+    const fs = require('fs');
+    const p = JSON.parse(fs.readFileSync('$pkg', 'utf8'));
+    p.version = '$next_version';
+    fs.writeFileSync('$pkg', JSON.stringify(p, null, 2) + '\n');
+  "
+  git add "$pkg"
+fi
 
-printf '%s\n' "$new_changelog" >"$changelog"
+if [[ "$rewrite_changelog" == true ]]; then
+  printf '%s\n' "$new_changelog" >"$changelog"
+  git add "$changelog"
+fi
 
-git add "$pkg" "$changelog"
-git commit -m "chore(release): $tag"
+# Only commit if the release actually changed tracked files; the first release
+# of an already-backfilled version just tags the current commit.
+if ! git diff --cached --quiet; then
+  git commit -m "chore(release): $tag"
+fi
+
 git tag "$tag"
 git push origin "$default_branch" --follow-tags
 
