@@ -46,4 +46,4 @@ As you add connectors, have the agent update the `AGENTS.md` to describe what's 
 
 This step is optional. You can use the company brain directly in your coding agent UI without Slack. But connecting it to Slack makes it accessible to your whole team - anyone can ask a question in a channel without opening a coding environment.
 
-See [cursor-cloud-agents.md](cursor-cloud-agents.md) for the setup.
+See [cursor-cloud-agents.md](cursor-cloud-agents.md) for the Cursor setup, or [claude-code-web.md](claude-code-web.md) to use Claude Code on the web or in Slack.
