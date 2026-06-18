@@ -200,7 +200,7 @@ main() {
     fi
     echo
     echo "git commit -m 'chore(release): $tag'  (only if package.json/CHANGELOG changed)"
-    echo "git tag $tag"
+    echo "git tag -a $tag -m $tag"
     echo "git push origin $default_branch --follow-tags"
     echo
     echo "gh release create $tag --title $tag --notes <<<"
