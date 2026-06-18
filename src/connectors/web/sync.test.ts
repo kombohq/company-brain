@@ -8,7 +8,15 @@
  * crawler turns a linked site into a mirror of local markdown files.
  */
 
-import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  mock,
+  spyOn,
+  test,
+} from "bun:test";
 import { mkdtemp, readFile, rm } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -17,14 +25,12 @@ import { syncWeb } from "./sync.js";
 // --- Test harness --------------------------------------------------------------
 
 /**
- * Stub `fetch` to serve `site` (a map of absolute URL → HTML). Unknown URLs return
- * 404, which the crawler treats as "gone" — so a link to a missing page is simply
- * not mirrored, exactly as for a real dead link. Returns a restore function.
+ * Serves `site` (a map of absolute URL → HTML). Unknown URLs return 404, which the
+ * crawler treats as "gone" — so a link to a missing page is simply not mirrored,
+ * exactly as for a real dead link.
  */
-function mockSite(site: Record<string, string>): () => void {
-  const original = globalThis.fetch;
-  globalThis.fetch = (async (input: string | URL | Request) => {
-    const url = String(input instanceof Request ? input.url : input);
+function serveSite(site: Record<string, string>) {
+  return (url: string): Response => {
     const html = site[url];
     return html === undefined
       ? new Response("not found", { status: 404 })
@@ -32,9 +38,6 @@ function mockSite(site: Record<string, string>): () => void {
           status: 200,
           headers: { "content-type": "text/html" },
         });
-  }) as typeof fetch;
-  return () => {
-    globalThis.fetch = original;
   };
 }
 
@@ -48,7 +51,8 @@ function htmlPage(title: string, main: string): string {
 }
 
 let outDir: string;
-let restoreFetch: () => void = () => {};
+/** The current site responder; each test swaps this in. */
+let respond: (url: string) => Response;
 
 beforeEach(async () => {
   outDir = await mkdtemp(join(tmpdir(), "web-e2e-"));
@@ -56,10 +60,18 @@ beforeEach(async () => {
   process.env.WEB_OUT_DIR = outDir;
   delete process.env.WEB_INCLUDE;
   delete process.env.WEB_MAX_PAGES;
+
+  respond = () => new Response("no response configured", { status: 500 });
+  spyOn(globalThis, "fetch").mockImplementation((async (
+    input: string | URL | Request,
+  ) =>
+    respond(
+      String(input instanceof Request ? input.url : input),
+    )) as typeof fetch);
 });
 
 afterEach(async () => {
-  restoreFetch();
+  mock.restore();
   await rm(outDir, { recursive: true, force: true });
   delete process.env.WEB_URL;
   delete process.env.WEB_OUT_DIR;
@@ -76,7 +88,7 @@ const exists = (rel: string) =>
 
 describe("syncWeb (end-to-end)", () => {
   test("crawls within the host and mirrors each page to a markdown file", async () => {
-    restoreFetch = mockSite({
+    respond = serveSite({
       "https://docs.example.com/": htmlPage(
         "Docs Home",
         `<h1>Welcome</h1>
@@ -129,14 +141,13 @@ describe("syncWeb (end-to-end)", () => {
       "https://docs.example.com/guide": htmlPage("Guide", "<p>guide</p>"),
       "https://docs.example.com/docs/setup": htmlPage("Setup", "<p>setup</p>"),
     };
-    restoreFetch = mockSite(full);
+    respond = serveSite(full);
     await syncWeb();
     expect(await exists("guide.md")).toBe(true);
 
     // The home page drops its link to /guide, so /guide is no longer discovered.
     // Its file records that URL in frontmatter and is pruned; the rest stay.
-    restoreFetch();
-    restoreFetch = mockSite({
+    respond = serveSite({
       ...full,
       "https://docs.example.com/": htmlPage(
         "Home",
@@ -151,7 +162,7 @@ describe("syncWeb (end-to-end)", () => {
   });
 
   test("a crawl that yields zero pages skips pruning, to survive an outage", async () => {
-    restoreFetch = mockSite({
+    respond = serveSite({
       "https://docs.example.com/": htmlPage("Home", "<p>hello</p>"),
     });
     await syncWeb();
@@ -159,8 +170,7 @@ describe("syncWeb (end-to-end)", () => {
 
     // The whole site is unreachable (every URL 404s, including the start page).
     // Discovering nothing must not be mistaken for "everything was deleted".
-    restoreFetch();
-    restoreFetch = mockSite({});
+    respond = serveSite({});
     await syncWeb();
     expect(await exists("index.md")).toBe(true);
   });
