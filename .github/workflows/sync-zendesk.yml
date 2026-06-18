@@ -29,5 +29,5 @@ jobs:
 
       - uses: ./.github/actions/sync-zendesk
         with:
-          subdomain: kombo-api
-          directory: context/kombo-api
+          subdomain: acme
+          directory: context/acme

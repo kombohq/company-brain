@@ -9,18 +9,24 @@ Ticket syncs are incremental on `updated_at`: only new or changed tickets have t
 
 Output: `context/pylon/`
 
-## Running
-
-```bash
-PYLON_API_TOKEN=... bun run pylon:sync              # incremental
-PYLON_CREATED_AFTER=2026-06-14 bun run pylon:sync   # only tickets created after a date
-```
-
-Set `PYLON_CREATED_AFTER` (a date or RFC3339 timestamp) to only sync tickets created after it. To force a full refetch, delete `context/pylon/tickets/` and re-run.
-
 ## Setup
 
 1. Create an API token at <https://app.usepylon.com/settings/api-tokens> with read access to issues and messages.
 2. Put it in `.env` as `PYLON_API_TOKEN` (local) and as a repo secret `PYLON_API_TOKEN` (for CI).
+
+Optional env vars:
+
+| Variable              | Default         | Description                                                                                                                                                                     |
+| --------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PYLON_CREATED_AFTER` | _(all tickets)_ | Only sync tickets created after this date (e.g. `2025-01-01` or a full RFC3339 timestamp). Useful for high-volume workspaces where syncing everything on the first run is slow. |
+| `PYLON_OUT_DIR`       | `context/pylon` | Override the output directory. Useful when syncing multiple Pylon workspaces into separate folders.                                                                             |
+
+## Running
+
+```bash
+bun run pylon:sync
+```
+
+To force a full refetch of all ticket content, delete `context/pylon/tickets/` and re-run.
 
 CI: `.github/workflows/sync-pylon.yml` — uncomment the `schedule:` block to enable automatic syncs.

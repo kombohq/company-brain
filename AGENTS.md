@@ -9,7 +9,7 @@ Runs on [Bun](https://bun.sh): TypeScript, no build step.
 - `src/connectors/<source>/` — one connector per data source, entry point `sync.ts`. Existing: `notion`, `repo`, `web`, `zendesk`, `pylon`, `granola`.
 - `src/lib/` — shared helpers
 - `context/<source>/` — synced output, committed to the repo so agents have durable context.
-- `.github/` — per-source sync action + scheduled workflow
+- `.github/` — per-source sync action + workflow (schedules are opt-in; uncomment the `schedule:` block in the matching workflow to enable)
 - `.agents/skills/` — skills for common tasks: `add-connector`, `setup-connector`
 
 ## Connector templates

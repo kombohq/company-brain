@@ -1,6 +1,6 @@
 # Git repository connector
 
-Mirrors another Git repository into the context as plain files. The source is shallow-cloned, its `.git` is dropped, and files removed upstream are deleted, so the result is a clean snapshot you can grep and link to.
+Mirrors another Git repository into the context as plain files. The source is shallow-cloned, its `.git` is dropped, and files removed upstream are deleted, so the result is a clean snapshot you can grep and link to. This is intentionally not a Git submodule: by copying the files directly into this repo, they are available to Cloud Agents and other tools that clone only this repository, with no extra setup required.
 
 Output: `context/<name>/`
 
@@ -13,6 +13,22 @@ Output: `context/<name>/`
    - **Repository permissions**: _Contents_ → **Read-only** (leave everything else as _No access_).
    - Set the shortest expiration you're comfortable with.
 3. Add the token as a repo secret (e.g. `EXAMPLE_REPO_TOKEN`) and reference it from the workflow step.
+
+Required env vars:
+
+| Variable   | Description                                                         |
+| ---------- | ------------------------------------------------------------------- |
+| `REPO_URL` | Repository to mirror, as `owner/name` (GitHub) or a full clone URL. |
+
+Optional env vars:
+
+| Variable       | Default          | Description                                                   |
+| -------------- | ---------------- | ------------------------------------------------------------- |
+| `REPO_TOKEN`   | _(none)_         | Access token for private repositories. Omit for public repos. |
+| `REPO_REF`     | `HEAD`           | Branch, tag, or commit to check out.                          |
+| `REPO_OUT_DIR` | `context/<name>` | Override the output directory.                                |
+
+Note: `git` and `rsync` must be on PATH. Both are available on GitHub Actions `ubuntu-latest`.
 
 ## Running
 

@@ -34,13 +34,15 @@ For a production example, see `src/customers/sync.ts` in [kombohq/agent-context]
 
 ## How it works
 
-- Each **data source** has a small sync script under `src/connectors/<source>/` that fetches data and writes it into `context/<source>/` as raw JSON next to agent-friendly Markdown.
-- A **GitHub Actions** workflow runs each sync on a schedule and commits the result back to the repo.
+- Each **data source** has a small sync script under `src/connectors/<source>/` that fetches data and writes it into `context/<source>/` as agent-friendly Markdown.
+- A **GitHub Actions** workflow runs each sync and commits the result back to the repo. Schedules are opt-in: uncomment the `schedule:` block in the matching workflow file to enable automatic daily syncs.
 - An AI agent reads `AGENTS.md` and the skills under `.agents/skills/` to learn what's in the repo and how to search it.
 
 Everything runs on [Bun](https://bun.sh). TypeScript scripts, no build step.
 
 ## Setup
+
+**Your repo must be private.** The auto-commit workflow refuses to run on public repos as a safety mechanism. Use "Use this template" on [kombohq/company-brain](https://github.com/kombohq/company-brain) to create a private copy.
 
 ```bash
 # Install Bun if you haven't: https://bun.sh
