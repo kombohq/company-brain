@@ -69,7 +69,7 @@ async function scanDisk(outDir: string): Promise<Map<string, string>> {
   return byUrl;
 }
 
-async function syncWeb(): Promise<void> {
+export async function syncWeb(): Promise<void> {
   const { startUrl, include, maxPages, outDir } = config();
   const startedAt = Date.now();
 
@@ -119,7 +119,10 @@ async function syncWeb(): Promise<void> {
   );
 }
 
-syncWeb().catch((err) => {
-  console.error("Web sync failed:", err);
-  process.exit(1);
-});
+// Only run when invoked directly (`bun run web:sync`), not when imported by tests.
+if (import.meta.main) {
+  syncWeb().catch((err) => {
+    console.error("Web sync failed:", err);
+    process.exit(1);
+  });
+}

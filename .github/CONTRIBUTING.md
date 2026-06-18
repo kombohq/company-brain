@@ -29,8 +29,22 @@ bun install
 ## Making Changes
 
 1. Branch from `main` (prefixes: `feat/`, `fix/`, `ref/`, `docs/`)
-2. Make your change and verify it locally
-3. Open a PR
+2. Make your change and verify it locally — run the same checks CI does:
+
+   ```bash
+   bun test          # run the test suite
+   bun run typecheck # tsc --noEmit
+   bun run lint      # oxlint
+   bun run format    # prettier --write (or format:check to only verify)
+   ```
+
+   Run a single test file with `bun test path/to/file.test.ts`, or
+   `bun test --watch` while iterating.
+
+3. Add or update tests for new logic or behaviour changes (pure refactors don't need new tests, but the suite must still pass)
+4. Open a PR
+
+Tests live next to the code as `*.test.ts` and run on [Bun's test runner](https://bun.sh/docs/cli/test). Test observable behaviour, not implementation details — the connector `sync.test.ts` files are end-to-end examples: they stub only the network and assert on the files a sync produces.
 
 ## Adding a Connector
 
