@@ -30,8 +30,6 @@ What we do at Kombo:
 
 **Infer** - use an LLM (e.g. in a Cursor Automation) to manage data on a recurring schedule: classify tickets, score conversations, extract structured data from unstructured text, or install MCPs to push tickets into Linear, manage TODOs from meetings, or similar.
 
-For a production example, see `src/customers/sync.ts` in [kombohq/agent-context](https://github.com/kombohq/agent-context).
-
 ## How it works
 
 - Each **data source** has a small sync script under `src/connectors/<source>/` that fetches data and writes it into `context/<source>/` as agent-friendly Markdown.
@@ -69,6 +67,7 @@ All synced data lives under `context/<source>/`. Detailed setup instructions for
 
 - [Running with Cursor Cloud Agents](docs/cursor-cloud-agents.md) — recommended for shared team access in Slack
 - [Chatting with the repository via Claude Code](docs/claude-code-web.md) — per-user setup, works from browser or phone
+- [Security considerations](docs/security.md) — what to weigh before sharing a company brain with employees or customers
 
 ## Adding a new source
 
