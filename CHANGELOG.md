@@ -18,4 +18,5 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 - Secret scanning (TruffleHog) and lefthook pre-commit hook (format + lint)
 - e2e happy-path tests for the Zendesk and web connectors
 - Docs: getting-started guide, per-connector docs, Cursor Cloud Agents and Claude Code on the web guides
+- Docs: security considerations page, plus `harden-package-managers.sh` to set a global minimum release age (supply-chain guard)
 - OSS community files (license, contributing scaffold)

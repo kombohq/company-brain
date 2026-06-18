@@ -48,7 +48,7 @@ A malicious package published to npm runs with full access to the environment at
 
 The most effective control is a minimum release age: refuse to install any package version published less than 5 days ago, giving the community time to detect and report malicious publishes before they reach you. Recent versions of Bun, npm, pnpm, and Yarn all support this natively.
 
-Running `bun install` triggers `scripts/harden-package-managers.sh` (via the `postinstall` hook), which sets this minimum age for whichever of those package managers are installed. Note that it writes to your **global** config (`~/.bunfig.toml` and equivalents), so the protection deliberately applies machine-wide, not just to this repo. If you would rather configure this yourself, remove the `postinstall` entry from `package.json`.
+Run `bash scripts/harden-package-managers.sh` once to set this minimum age for whichever of those package managers are installed. It writes to your **global** config (`~/.bunfig.toml` and equivalents), so the protection applies machine-wide and to every future install, not just this repo.
 
 ## Risk cannot be zero
 
