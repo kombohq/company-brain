@@ -8,9 +8,9 @@ Maintainer tooling for this repo.
   `[Unreleased]` section into a dated version section, commit, tag, push, and
   create the GitHub release. Split into pure helper functions (unit-tested) and
   a `main()` that wires them to `git`/`gh`.
-- `release_test.sh` — [bashunit](https://bashunit.com) unit tests for
+- `tests/release_test.sh` — [bashunit](https://bashunit.com) unit tests for
   `release.sh`'s pure helpers.
-- `release_integration_test.sh` — bashunit tests that run `release.sh`
+- `tests/release_integration_test.sh` — bashunit tests that run `release.sh`
   end-to-end against a throwaway git repo with a stubbed `gh`, covering the
   decision paths and side effects (commit, tag, push, release notes).
 
@@ -50,10 +50,15 @@ The script does the irreversible steps last (commit, then tag, then push, then
 ## Running the tests
 
 ```bash
-bun run test:sh            # runs bashunit over this directory
+bun run test:sh            # runs bashunit over scripts/tests
 ```
 
-`bashunit` is a dev dependency, so `bun install` provides it; CI runs the same
-command. Tests source `release.sh` (which only defines functions when sourced)
-and exercise the pure helpers in isolation, with no `git`/`gh` side effects.
-Add a `test_*` function to `release_test.sh` for new behavior.
+`bashunit` is a dev dependency, so `bun install` provides it locally. In CI a
+dedicated `shell-tests` job (`.github/workflows/ci.yml`) installs bashunit via
+the [`TypedDevs/bashunit`](https://bashunit.com/installation) action and runs
+`bashunit scripts/tests`.
+
+The unit tests source `release.sh` (which only defines functions when sourced)
+and exercise the pure helpers in isolation; the integration tests run the script
+as a subprocess against a throwaway repo. Add a `test_*` function to the
+matching file in `tests/` for new behavior.

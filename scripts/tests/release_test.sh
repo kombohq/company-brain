@@ -7,7 +7,7 @@
 # helper can be exercised in isolation with no git/gh side effects.
 
 # shellcheck source=scripts/release.sh
-source "$(dirname "$BASH_SOURCE")/release.sh"
+source "$(dirname "$BASH_SOURCE")/../release.sh"
 
 # A small changelog fixture: an empty [Unreleased] above a populated [1.0.0].
 CHANGELOG_FIXTURE="# Changelog

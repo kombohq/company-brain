@@ -8,7 +8,7 @@
     "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "test:sh": "bashunit scripts",
+    "test:sh": "bashunit scripts/tests",
     "lint": "oxlint",
     "notion:sync": "bun run src/connectors/notion/sync.ts",
     "web:sync": "bun run src/connectors/web/sync.ts",

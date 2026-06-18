@@ -8,7 +8,7 @@
 # subprocess, so they exercise the wiring: arg handling, preflight, the
 # reuse-vs-rewrite-vs-abort branching, committing, tagging, and pushing.
 
-REAL_RELEASE="$(cd "$(dirname "$BASH_SOURCE")" && pwd)/release.sh"
+REAL_RELEASE="$(cd "$(dirname "$BASH_SOURCE")/.." && pwd)/release.sh"
 
 # Fresh sandbox per test: a bare "origin", a stubbed gh (logs its args to
 # $GH_LOG; fails on `release create` when GH_FAIL_RELEASE=1), and a copy of the
