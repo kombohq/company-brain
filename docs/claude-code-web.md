@@ -19,7 +19,7 @@ You can now use it from any device.
 
 You can also @mention Claude directly in a Slack channel. A workspace admin installs the Claude app once from the Slack App Marketplace, then each user connects their own Claude account via the Claude App Home in Slack.
 
-**This is not a shared resource.** Every person who wants to interact in Slack must individually have a qualifying Claude plan and GitHub access to this repository. This makes it subideal for broad team use — the web interface above is the simpler starting point.
+**This is not a shared resource.** Every person who wants to interact in Slack must individually have a qualifying Claude plan and GitHub access to this repository. If you want the whole team to ask questions without individual setup, use the [Cursor Cloud Agents setup](cursor-cloud-agents.md) instead — it's a single shared bot anyone in the channel can talk to.
 
 ### Slack setup (per user)
 
