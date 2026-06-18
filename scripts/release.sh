@@ -144,7 +144,7 @@ main() {
   tag="v${next_version}"
   today="$(date +%F)"
 
-  git rev-parse "$tag" >/dev/null 2>&1 && die "tag $tag already exists"
+  git rev-parse "$tag" >/dev/null 2>&1 && die "tag $tag already exists (delete it to redo, or if only the GitHub release is missing run: gh release create $tag)"
 
   # --- Decide changelog action + release notes -----------------------------
 
@@ -229,7 +229,14 @@ main() {
   # signing enabled); a lightweight tag would be rejected under tag.gpgsign.
   git tag -a "$tag" -m "$tag"
   git push origin "$default_branch" --follow-tags
-  gh release create "$tag" --title "$tag" --notes "$release_notes"
+
+  # The commit and tag are now pushed; if only the release object fails to
+  # create, the release can be finished without redoing any of the above.
+  if ! gh release create "$tag" --title "$tag" --notes "$release_notes"; then
+    die "tag $tag was committed and pushed, but 'gh release create' failed.
+Once resolved, finish the release with:
+  gh release create $tag --title $tag --notes '<the $tag section of CHANGELOG.md>'"
+  fi
 
   echo "Released $tag"
 }

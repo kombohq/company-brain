@@ -8,8 +8,11 @@ Maintainer tooling for this repo.
   `[Unreleased]` section into a dated version section, commit, tag, push, and
   create the GitHub release. Split into pure helper functions (unit-tested) and
   a `main()` that wires them to `git`/`gh`.
-- `release_test.sh` — [bashunit](https://bashunit.com) tests for `release.sh`'s
-  pure helpers.
+- `release_test.sh` — [bashunit](https://bashunit.com) unit tests for
+  `release.sh`'s pure helpers.
+- `release_integration_test.sh` — bashunit tests that run `release.sh`
+  end-to-end against a throwaway git repo with a stubbed `gh`, covering the
+  decision paths and side effects (commit, tag, push, release notes).
 
 ## Cutting a release
 
@@ -26,9 +29,23 @@ bun run release --dry-run  # print the plan without changing anything
 Requires `gh` (authenticated) and `bun`. If `CHANGELOG.md` already has a section
 for the target version (e.g. the backfilled first release), the script reuses
 that section as the release notes instead of inserting a duplicate; pass
-`--allow-empty` to release when `[Unreleased]` has no entries.
+`--allow-empty` to release when `[Unreleased]` has no entries. The release
+commit and tag are GPG-signed when you have `commit.gpgsign` / `tag.gpgsign`
+enabled.
 
 Keep `[Unreleased]` current as you work — see the `update-changelog` skill.
+
+## Recovery
+
+The script does the irreversible steps last (commit, then tag, then push, then
+`gh release create`), so a failure is easy to finish by hand:
+
+- **`gh release create` failed** (commit and tag already pushed): re-create just
+  the release with the version's CHANGELOG section as the notes. The script
+  prints the exact `gh release create` command to run on failure.
+- **Want to redo a release**: delete the tag locally and on the remote
+  (`git tag -d vX.Y.Z && git push origin :vX.Y.Z`), then re-run. Re-running
+  without deleting aborts with "tag already exists".
 
 ## Running the tests
 
