@@ -11,8 +11,8 @@ name: Sync Granola
 on:
   # Uncomment to enable automatic daily sync.
   # schedule:
-  #   # 04:00 UTC daily.
-  #   - cron: "0 4 * * *"
+  #   # 04:05 UTC daily.
+  #   - cron: "5 4 * * *"
   workflow_dispatch:
 
 concurrency:

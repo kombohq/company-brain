@@ -10,6 +10,12 @@ Output: `context/notion/`
 2. Share the top-level pages/databases you want synced with the integration.
 3. Put the token in `.env` as `NOTION_TOKEN` (local) and as a repo secret `NOTION_TOKEN` (for CI).
 
+Optional env vars:
+
+| Variable         | Default          | Description                                                                                                                                                                       |
+| ---------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NOTION_OUT_DIR` | `context/notion` | Override the output directory. Useful when syncing multiple Notion integrations into separate folders — copy the workflow and point each step at a different token and directory. |
+
 ## Running
 
 ```bash

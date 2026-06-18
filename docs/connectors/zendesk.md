@@ -4,14 +4,29 @@ Mirrors a Zendesk Help Center's published articles into the context as one Markd
 
 Output: `context/<subdomain>/`
 
+## Setup
+
+No credentials required.
+
+Required env vars:
+
+| Variable            | Description                               |
+| ------------------- | ----------------------------------------- |
+| `ZENDESK_SUBDOMAIN` | The `X` in `X.zendesk.com` (e.g. `acme`). |
+
+Optional env vars:
+
+| Variable          | Default               | Description                                                               |
+| ----------------- | --------------------- | ------------------------------------------------------------------------- |
+| `ZENDESK_LOCALE`  | `en-us`               | Guide locale to sync. Set to e.g. `de` to mirror a different language.    |
+| `ZENDESK_OUT_DIR` | `context/<subdomain>` | Override the output directory. Useful when syncing multiple Help Centers. |
+
 ## Running
 
 ```bash
-ZENDESK_SUBDOMAIN=acme bun run zendesk:sync                    # mirror into context/acme
-ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync  # a different Guide locale
+ZENDESK_SUBDOMAIN=acme bun run zendesk:sync
+ZENDESK_SUBDOMAIN=acme ZENDESK_LOCALE=de bun run zendesk:sync
 ```
-
-`ZENDESK_SUBDOMAIN` is the `X` in `X.zendesk.com`.
 
 The reusable `./.github/actions/sync-zendesk` action syncs one Help Center per step. To mirror several, add more steps to `.github/workflows/sync-zendesk.yml` or copy the workflow, each pointing at a different subdomain and directory.
 

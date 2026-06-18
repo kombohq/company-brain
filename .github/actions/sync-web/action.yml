@@ -10,7 +10,7 @@ inputs:
     description: Start page to crawl, or a sitemap URL ending in ".xml".
     required: true
   directory:
-    description: Directory to sync into, relative to the repo root (e.g. "context/kombo.dev").
+    description: Directory to sync into, relative to the repo root (e.g. "context/example.com").
     required: true
   include:
     description: Regex tested against the URL path; only matching pages are synced (optional).

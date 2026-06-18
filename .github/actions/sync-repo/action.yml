@@ -9,7 +9,7 @@ inputs:
     description: 'Repository to pull, either "owner/name" (GitHub) or a full clone URL.'
     required: true
   directory:
-    description: Directory to sync into, relative to the repo root (e.g. "context/kombo").
+    description: Directory to sync into, relative to the repo root (e.g. "context/repo-name").
     required: true
   token:
     description: >-

@@ -10,6 +10,12 @@ Output: `context/granola/`
 2. Create a new key with the **Personal notes** and/or **Public notes** scope (Business or Enterprise plan required).
 3. Put the key in `.env` as `GRANOLA_API_KEY` (local) and as a repo secret `GRANOLA_API_KEY` (for CI).
 
+Optional env vars:
+
+| Variable          | Default           | Description                                                                                         |
+| ----------------- | ----------------- | --------------------------------------------------------------------------------------------------- |
+| `GRANOLA_OUT_DIR` | `context/granola` | Override the output directory. Useful when syncing multiple Granola accounts into separate folders. |
+
 ## Running
 
 ```bash

@@ -7,10 +7,10 @@ description: >-
 
 inputs:
   subdomain:
-    description: The "X" in X.zendesk.com (e.g. "kombo-api").
+    description: The "X" in X.zendesk.com (e.g. "acme").
     required: true
   directory:
-    description: Directory to sync into, relative to the repo root (e.g. "context/kombo-api").
+    description: Directory to sync into, relative to the repo root (e.g. "context/acme").
     required: true
   locale:
     description: Guide locale segment, e.g. "en-us" (optional).
