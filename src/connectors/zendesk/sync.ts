@@ -28,9 +28,7 @@ const DEFAULT_LOCALE = "en-us";
 function config() {
   const subdomain = process.env.ZENDESK_SUBDOMAIN?.trim();
   if (!subdomain) {
-    throw new Error(
-      'ZENDESK_SUBDOMAIN is required (the "X" in X.zendesk.com, e.g. "kombo-api")',
-    );
+    throw new Error('ZENDESK_SUBDOMAIN is required (the "X" in X.zendesk.com)');
   }
   const locale = process.env.ZENDESK_LOCALE?.trim() || DEFAULT_LOCALE;
   const outDir = process.env.ZENDESK_OUT_DIR

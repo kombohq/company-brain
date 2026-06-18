@@ -22,4 +22,3 @@ Company Brain syncs data from third-party APIs into a Git repository. Security c
 
 - **Credentials**: API tokens and secrets are passed via environment variables and never committed to the repository
 - **Synced content**: The `context/` directory contains data pulled from your company's sources — review what you commit and who has repo access
-- **Dependencies**: We track CVEs in Bun/npm dependencies via Dependabot
