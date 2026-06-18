@@ -1,6 +1,6 @@
 # Git repository connector
 
-Mirrors another Git repository into the context as plain files. The source is shallow-cloned, its `.git` is dropped, and files removed upstream are deleted, so the result is a clean snapshot you can grep and link to.
+Mirrors another Git repository into the context as plain files. The source is shallow-cloned, its `.git` is dropped, and files removed upstream are deleted, so the result is a clean snapshot you can grep and link to. This is intentionally not a Git submodule: by copying the files directly into this repo, they are available to Cloud Agents and other tools that clone only this repository, with no extra setup required.
 
 Output: `context/<name>/`
 
