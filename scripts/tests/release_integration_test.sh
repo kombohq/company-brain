@@ -67,6 +67,21 @@ function pkg_json() { cat "$WORK/package.json"; }
 
 # --- normal release --------------------------------------------------------
 
+function test_default_bump_is_minor() {
+  scaffold_repo "1.2.3" "# Changelog
+
+## [Unreleased]
+
+### Added
+
+- A feature"
+
+  run_release >/dev/null 2>&1
+
+  assert_contains '"version": "1.3.0"' "$(pkg_json)"
+  assert_contains "v1.3.0" "$(remote_tags)"
+}
+
 function test_patch_release_bumps_rewrites_tags_and_publishes() {
   scaffold_repo "1.2.3" "# Changelog
 

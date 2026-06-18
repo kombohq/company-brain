@@ -6,8 +6,8 @@
 # Usage:
 #   bun run release [patch|minor|major|X.Y.Z] [--dry-run] [--allow-empty]
 #
-#   patch (default)  bump the patch component (1.2.3 -> 1.2.4)
-#   minor            bump the minor component (1.2.3 -> 1.3.0)
+#   minor (default)  bump the minor component (1.2.3 -> 1.3.0)
+#   patch            bump the patch component (1.2.3 -> 1.2.4)
 #   major            bump the major component (1.2.3 -> 2.0.0)
 #   X.Y.Z            set an explicit version
 #
@@ -104,7 +104,7 @@ main() {
   cd "$repo_root"
 
   local pkg="package.json" changelog="CHANGELOG.md"
-  local bump="patch" dry_run=false allow_empty=false arg
+  local bump="minor" dry_run=false allow_empty=false arg
   for arg in "$@"; do
     case "$arg" in
       patch | minor | major) bump="$arg" ;;

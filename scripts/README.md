@@ -15,8 +15,8 @@ Maintainer tooling.
 From the default branch with a clean tree (needs authenticated `gh` and `bun`):
 
 ```bash
-bun run release            # patch: 1.2.3 -> 1.2.4
-bun run release minor      # 1.2.3 -> 1.3.0
+bun run release            # minor (default): 1.2.3 -> 1.3.0
+bun run release patch      # 1.2.3 -> 1.2.4
 bun run release major      # 1.2.3 -> 2.0.0
 bun run release 2.1.0      # explicit version
 bun run release --dry-run  # show the plan, change nothing
