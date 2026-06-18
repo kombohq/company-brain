@@ -30,15 +30,5 @@ jobs:
 
       - uses: ./.github/actions/sync-web
         with:
-          url: https://kombo.dev
-          directory: context/kombo.dev
-
-      - uses: ./.github/actions/sync-web
-        with:
-          url: https://docs.kombo.dev
-          directory: context/docs.kombo.dev
-
-      - uses: ./.github/actions/sync-web
-        with:
-          url: https://help.kombo.dev
-          directory: context/help.kombo.dev
+          url: https://www.example.com
+          directory: context/example.com

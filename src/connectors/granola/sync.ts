@@ -1,7 +1,6 @@
 /**
  * Mirror Granola meeting notes into context/granola/ as one markdown file per note
- * (frontmatter holds granola_id, title, updated_at, web_url; body is the AI summary
- * followed by the full transcript).
+ * (frontmatter holds granola_id, title, updated_at, web_url; body is the full transcript).
  *
  * Incremental: updated_at from the list endpoint is compared to what is stored in each
  * file's frontmatter; only new or changed notes get the more expensive per-note fetch.

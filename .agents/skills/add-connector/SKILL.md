@@ -35,6 +35,9 @@ Look at the existing connectors before writing a new one:
 - `src/connectors/notion/` — API mirror, incremental by `last_edited_time`, prunes unshared/deleted nodes.
 - `src/connectors/web/` — crawl/sitemap → one Markdown file per page, prunes by source URL.
 - `src/connectors/repo/` — shallow git clone of another repo, `.git` dropped.
+- `src/connectors/zendesk/` — public API (no token), single env var to configure, flat output.
+- `src/connectors/pylon/` — token-authenticated API, multiple output subdirs (`tickets/`, `accounts/`), date filter via env var.
+- `src/connectors/granola/` — token-authenticated API, `continue-on-error` + surface-after-commit pattern.
 
 ## package.json
 
@@ -58,6 +61,6 @@ Mirror the existing actions exactly:
 2. Implement `src/connectors/<source>/sync.ts` with Bun; env-var config; `processParallel` for list-then-detail; incremental + safe prune.
 3. Add the **`<source>:sync`** script to `package.json`.
 4. Document the env vars in **`.env.example`** (link to where the credential is created, plus the minimal permissions needed).
-5. Add the data-source section to **`README.md`** (setup steps, how to run, CI schedule).
+5. Create **`docs/connectors/<source>.md`** with Setup (credentials + env vars) and Running sections, following the existing connector docs as a model. Add a link to it in `README.md` under Connectors.
 6. Add the reusable action and workflow under `.github/`.
 7. Verify before finishing: `bun run typecheck`, `bun run lint`, `bun run format`, and a quick local smoke run of the sync.

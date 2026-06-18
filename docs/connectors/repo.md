@@ -14,6 +14,22 @@ Output: `context/<name>/`
    - Set the shortest expiration you're comfortable with.
 3. Add the token as a repo secret (e.g. `EXAMPLE_REPO_TOKEN`) and reference it from the workflow step.
 
+Required env vars:
+
+| Variable   | Description                                                         |
+| ---------- | ------------------------------------------------------------------- |
+| `REPO_URL` | Repository to mirror, as `owner/name` (GitHub) or a full clone URL. |
+
+Optional env vars:
+
+| Variable       | Default          | Description                                                   |
+| -------------- | ---------------- | ------------------------------------------------------------- |
+| `REPO_TOKEN`   | _(none)_         | Access token for private repositories. Omit for public repos. |
+| `REPO_REF`     | `HEAD`           | Branch, tag, or commit to check out.                          |
+| `REPO_OUT_DIR` | `context/<name>` | Override the output directory.                                |
+
+Note: `git` and `rsync` must be on PATH. Both are available on GitHub Actions `ubuntu-latest`.
+
 ## Running
 
 ```bash

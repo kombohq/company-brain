@@ -31,7 +31,9 @@ Direct the user to: `https://github.com/<owner>/<repo>/settings/secrets/actions`
 
 ## 4. Configure the CI workflow
 
-The workflow files under `.github/workflows/` are templates. Before enabling them:
+The workflow files under `.github/workflows/` are templates that ship with placeholder values. Before enabling them, read the connector's doc at `docs/connectors/<source>.md` to understand what needs to be customized.
+
+**Replace placeholder values.** Each workflow ships with example URLs, subdomains, repo names, or other source-specific values (e.g. `kombo.dev`, `owner/example`, `kombo-api`). Update these to point at the real source before committing.
 
 **Rename and describe the workflow.** Update the `name:` field at the top to reflect what it actually syncs (e.g. `Sync Public docs` instead of `Sync Web`). This makes the Actions tab readable when multiple workflows are running.
 
