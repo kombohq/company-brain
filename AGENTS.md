@@ -10,8 +10,12 @@ Runs on [Bun](https://bun.sh): TypeScript, no build step.
 - `src/lib/` — shared helpers
 - `context/<source>/` — synced output, committed to the repo so agents have durable context.
 - `.github/` — per-source sync action + workflow (schedules are opt-in; uncomment the `schedule:` block in the matching workflow to enable)
-- `.agents/skills/` — skills for common tasks: `add-connector`, `setup-connector`
+- `.agents/skills/` — skills for common tasks: `add-connector`, `setup-connector`, `update-changelog`
 
 ## Connector templates
 
 The canonical connector templates live at https://github.com/kombohq/company-brain/tree/main/src/connectors/. Before building a new connector from scratch, check there for the latest patterns.
+
+## Changelog
+
+Every user-facing change (a feature or bug fix) adds a terse bullet to `CHANGELOG.md` under `## [Unreleased]`. See the `update-changelog` skill. Releases are cut with `bun run release` (`scripts/release.sh`), which rolls `[Unreleased]` into a dated version section, tags, and creates the GitHub release. The script's pure helpers are unit-tested with [bashunit](https://bashunit.com) (`bun run test:sh`, `scripts/release_test.sh`).

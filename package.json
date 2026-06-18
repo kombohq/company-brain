@@ -1,6 +1,6 @@
 {
   "name": "company-brain",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A long-term sync hub that checks your company's data sources into Git as searchable files, so an AI agent has durable context.",
   "license": "MIT",
   "type": "module",
@@ -8,6 +8,7 @@
     "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "test:sh": "bashunit scripts/tests",
     "lint": "oxlint",
     "notion:sync": "bun run src/connectors/notion/sync.ts",
     "web:sync": "bun run src/connectors/web/sync.ts",
@@ -16,12 +17,14 @@
     "zendesk:sync": "bun run src/connectors/zendesk/sync.ts",
     "granola:sync": "bun run src/connectors/granola/sync.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "release": "bash scripts/release.sh"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^22.0.0",
     "@types/turndown": "^5.0.6",
+    "bashunit": "^0.40.0",
     "lefthook": "^2.1.9",
     "oxlint": "^1.68.0",
     "prettier": "^3.8.3",
