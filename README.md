@@ -67,8 +67,8 @@ All synced data lives under `context/<source>/`. Detailed setup instructions for
 
 ## Further reading
 
-- [Running with Cursor Cloud Agents](docs/cursor-cloud-agents.md)
-- [Chatting with the repository via Claude Code](docs/claude-code-web.md)
+- [Running with Cursor Cloud Agents](docs/cursor-cloud-agents.md) — recommended for shared team access in Slack
+- [Chatting with the repository via Claude Code](docs/claude-code-web.md) — per-user setup, works from browser or phone
 
 ## Adding a new source
 
