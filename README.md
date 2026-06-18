@@ -87,3 +87,7 @@ All connectors pick this up automatically. Leave it unset in CI so production sy
 ## License
 
 [MIT](LICENSE)
+
+---
+
+Built with ❤️ by [Kombo](https://kombo.dev) in Berlin.
