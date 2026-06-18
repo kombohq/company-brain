@@ -61,7 +61,7 @@ async function scanDisk(outDir: string): Promise<Map<number, string>> {
   return byId;
 }
 
-async function syncZendesk(): Promise<void> {
+export async function syncZendesk(): Promise<void> {
   const { subdomain, locale, outDir } = config();
   const startedAt = Date.now();
 
@@ -109,7 +109,10 @@ async function syncZendesk(): Promise<void> {
   );
 }
 
-syncZendesk().catch((err) => {
-  console.error("Zendesk sync failed:", err);
-  process.exit(1);
-});
+// Only run when invoked directly (`bun run zendesk:sync`), not when imported by tests.
+if (import.meta.main) {
+  syncZendesk().catch((err) => {
+    console.error("Zendesk sync failed:", err);
+    process.exit(1);
+  });
+}
