@@ -13,6 +13,7 @@
         "@types/bun": "latest",
         "@types/node": "^22.0.0",
         "@types/turndown": "^5.0.6",
+        "bashunit": "^0.40.0",
         "lefthook": "^2.1.9",
         "oxlint": "^1.68.0",
         "prettier": "^3.8.3",
@@ -70,6 +71,8 @@
     "@types/turndown": ["@types/turndown@5.0.6", "", {}, "sha512-ru00MoyeeouE5BX4gRL+6m/BsDfbRayOskWqUvh7CLGW+UXxHQItqALa38kKnOiZPqJrtzJUgAC2+F0rL1S4Pg=="],
 
     "argparse": ["argparse@1.0.10", "", { "dependencies": { "sprintf-js": "~1.0.2" } }, "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg=="],
+
+    "bashunit": ["bashunit@0.40.0", "", { "os": [ "linux", "darwin", ], "bin": { "bashunit": "bin/bashunit" } }, "sha512-LfSFCTekMJHrhJc+fzOVXnCYtTOK6FGWeHWsmc/FSYGAvrdQTnWox/oTmELiFnQlYAkxZkgWg0DL3dMQborp8Q=="],
 
     "bun-types": ["bun-types@1.3.14", "", { "dependencies": { "@types/node": "*" } }, "sha512-4N0ig0fEomHt5R0KCFWjovxow98rIoRwKolrYdCcknNwMekCXRnWEUvgu5soYV8QXtVsrUD8B95MBOZGPvr6KQ=="],
 

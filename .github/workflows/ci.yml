@@ -29,3 +29,6 @@ jobs:
 
       - name: Test
         run: bun run test
+
+      - name: Test shell scripts
+        run: bun run test:sh

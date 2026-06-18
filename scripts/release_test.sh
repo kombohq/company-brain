@@ -40,7 +40,8 @@ function test_bump_explicit_version_is_used_verbatim() {
 }
 
 function test_bump_rejects_garbage() {
-  assert_general_error "$(bump_version "1.2.3" nonsense 2>&1)"
+  bump_version "1.2.3" nonsense && local rc=0 || local rc=1
+  assert_same "1" "$rc"
 }
 
 # --- section_body ----------------------------------------------------------
@@ -79,24 +80,14 @@ function test_has_content_false_for_whitespace() {
 
 # --- insert_release_section ------------------------------------------------
 
-function test_insert_adds_dated_section_under_unreleased() {
-  local out
+# One assertion on the heading order covers all of: a fresh empty [Unreleased]
+# stays on top, the new dated section is inserted directly below it, and the
+# previous release section is left intact underneath.
+function test_insert_release_section_heading_order() {
+  local out headings
   out="$(echo "$CHANGELOG_FIXTURE" | insert_release_section "1.1.0" "2026-07-01")"
-  assert_contains "## [1.1.0] - 2026-07-01" "$out"
-}
-
-function test_insert_keeps_unreleased_heading() {
-  # A fresh empty [Unreleased] must remain at the top after a release.
-  local out
-  out="$(echo "$CHANGELOG_FIXTURE" | insert_release_section "1.1.0" "2026-07-01")"
-  assert_contains "## [Unreleased]" "$out"
-}
-
-function test_insert_places_new_section_directly_after_unreleased() {
-  local out first_two_headings
-  out="$(echo "$CHANGELOG_FIXTURE" | insert_release_section "1.1.0" "2026-07-01")"
-  first_two_headings="$(echo "$out" | grep '^## ' | head -2 | tr '\n' '|')"
-  assert_same "## [Unreleased]|## [1.1.0] - 2026-07-01|" "$first_two_headings"
+  headings="$(echo "$out" | grep '^## ' | tr '\n' '|')"
+  assert_same "## [Unreleased]|## [1.1.0] - 2026-07-01|## [1.0.0] - 2026-06-18|" "$headings"
 }
 
 # --- strip_blank_lines -----------------------------------------------------

@@ -18,4 +18,4 @@ The canonical connector templates live at https://github.com/kombohq/company-bra
 
 ## Changelog
 
-Every user-facing change (a feature or bug fix) adds a terse bullet to `CHANGELOG.md` under `## [Unreleased]`. See the `update-changelog` skill. Releases are cut with `bun run release` (`scripts/release.sh`), which rolls `[Unreleased]` into a dated version section, tags, and creates the GitHub release.
+Every user-facing change (a feature or bug fix) adds a terse bullet to `CHANGELOG.md` under `## [Unreleased]`. See the `update-changelog` skill. Releases are cut with `bun run release` (`scripts/release.sh`), which rolls `[Unreleased]` into a dated version section, tags, and creates the GitHub release. The script's pure helpers are unit-tested with [bashunit](https://bashunit.com) (`bun run test:sh`, `scripts/release_test.sh`).
