@@ -41,20 +41,10 @@ bun install
    Run a single test file with `bun test path/to/file.test.ts`, or
    `bun test --watch` while iterating.
 
-3. Add or update tests (see below), then open a PR
+3. Add or update tests for new logic or behaviour changes (pure refactors don't need new tests, but the suite must still pass)
+4. Open a PR
 
-### Tests are required
-
-Any PR that adds new logic or changes behaviour **must** add or update tests to
-cover it — a bug fix should come with a test that fails without the fix. Pure
-refactors that keep behaviour identical don't need new tests, but the existing
-suite must still pass. PRs without the tests their change warrants will be asked
-to add them before merge.
-
-Tests live next to the code as `*.test.ts` (e.g. `src/connectors/<source>/sync.test.ts`)
-and run on [Bun's test runner](https://bun.sh/docs/cli/test). The connector `sync.test.ts`
-files are end-to-end: they stub only the network and assert on the files a sync produces.
-Prefer testing observable behaviour (the files a sync produces) over implementation details.
+Tests live next to the code as `*.test.ts` and run on [Bun's test runner](https://bun.sh/docs/cli/test). Test observable behaviour, not implementation details — the connector `sync.test.ts` files are end-to-end examples: they stub only the network and assert on the files a sync produces.
 
 ## Adding a Connector
 
