@@ -145,8 +145,9 @@ export class GrainClient {
       for (const recording of page.recordings) {
         yield recording;
       }
-      cursor = page.recordings.length > 0 ? page.cursor : null;
-    } while (cursor !== null);
+
+      cursor = page.cursor;
+    } while (cursor);
   }
 
   async getTranscript(recordingId: string): Promise<TranscriptSegment[]> {
