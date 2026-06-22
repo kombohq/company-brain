@@ -1,0 +1,53 @@
+name: Sync Grain
+description: >-
+  Mirror Grain recordings into the given directory as markdown and commit the
+  result. Requires a Grain Personal or Workspace Access Token.
+
+inputs:
+  grain-api-key:
+    description: Grain Personal or Workspace Access Token (Settings → Integrations → API).
+    required: true
+  directory:
+    description: Directory to sync into, relative to the repo root (e.g. "context/grain").
+    required: true
+  commit-message:
+    description: Commit message for the synced changes.
+    required: false
+    default: "chore: sync Grain"
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    # continue-on-error so a partial sync (e.g. an API timeout mid-run) still commits
+    # the recordings it wrote; the next run resumes from there. The failure is
+    # re-surfaced after the commit.
+    - name: Sync Grain
+      id: sync
+      shell: bash
+      continue-on-error: true
+      env:
+        GRAIN_API_KEY: ${{ inputs.grain-api-key }}
+        GRAIN_OUT_DIR: ${{ inputs.directory }}
+      run: bun run grain:sync
+
+    - name: Commit and push changes
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/commit-and-push
+      with:
+        message: ${{ inputs.commit-message }}
+        paths: "${{ inputs.directory }}/**"
+
+    - name: Surface sync failure
+      if: ${{ steps.sync.outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "Sync step failed; any recordings synced before the failure were committed." >&2
+        exit 1
