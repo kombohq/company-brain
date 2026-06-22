@@ -5,13 +5,17 @@ import { keepRecording } from "./filter.js";
 function previewLine(recording: Recording, keep: boolean): string {
   const tag = keep ? "[ SYNC ]" : "[ SKIP ]";
   const date = recording.start_datetime.slice(0, 10);
+  const minutes = `${Math.round((recording.duration_ms ?? 0) / 60000)}m`;
   const type = recording.meeting_type?.name ?? "-";
-  const teams = recording.teams.map((t) => t.name).join("/") || "-";
+  const teams = (recording.teams ?? []).map((t) => t.name).join("/") || "-";
   const participants =
-    recording.participants
+    (recording.participants ?? [])
       .map((p) => `${p.scope}:${p.email ?? p.name}`)
       .join(", ") || "-";
-  return `${tag} ${date} ${recording.source} | type=${type} | teams=${teams} | ${recording.title} | ${participants}`;
+  const tags = recording.tags?.length
+    ? ` | tags=${recording.tags.join(",")}`
+    : "";
+  return `${tag} ${date} ${minutes} ${recording.source} | type=${type} | teams=${teams} | ${recording.title} | ${participants}${tags}`;
 }
 
 // Lists recordings and prints what shouldSync() keeps/skips, without fetching
