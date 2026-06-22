@@ -16,6 +16,8 @@
     "pylon:sync": "bun run src/connectors/pylon/sync.ts",
     "zendesk:sync": "bun run src/connectors/zendesk/sync.ts",
     "granola:sync": "bun run src/connectors/granola/sync.ts",
+    "grain:sync": "bun run src/connectors/grain/sync.ts",
+    "grain:preview": "bun run src/connectors/grain/sync.ts --preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "release": "bash scripts/release.sh"
