@@ -8,7 +8,8 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Connectors that sync into `context/`: Notion, web, repo, Zendesk, Pylon, Granola
+- Connectors that sync into `context/`: Notion, web, repo, Zendesk, Pylon, Granola, Grain
+- Grain connector: mirrors recordings (metadata + transcript) with a `shouldSync()` filter, a `grain:preview` command to tune it without fetching transcripts, and a `GRAIN_AFTER` cutoff date
 - Reusable GitHub Actions + per-connector sync workflows (schedules opt-in)
 - `commit-and-push` action with safety guards (refuses to commit `context/` on the public template repo)
 - Skills: `add-connector`, `setup-connector`, `update-changelog`

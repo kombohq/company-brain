@@ -62,6 +62,7 @@ All synced data lives under `context/<source>/`. Detailed setup instructions for
 - [Web crawler](docs/connectors/web.md)
 - [Zendesk Help Center](docs/connectors/zendesk.md)
 - [Pylon](docs/connectors/pylon.md)
+- [Grain](docs/connectors/grain.md)
 
 ## Further reading
 
