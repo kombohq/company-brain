@@ -46,4 +46,4 @@ As you add connectors, have the agent update the `AGENTS.md` to describe what's 
 
 This step is optional. You can use the company brain directly in your coding agent UI without Slack. But connecting it to Slack makes it accessible to your whole team - anyone can ask a question in a channel without opening a coding environment.
 
-For shared team access (anyone in the channel, no individual setup), use the [Cursor Cloud Agents setup](cursor-cloud-agents.md). If you prefer Claude Code, see [claude-code-web.md](claude-code-web.md) — note that each user needs their own Claude account and GitHub access.
+For shared team access (anyone in the channel, no individual setup), use [Claude Tag](claude-tag.md) — Anthropic's shared `@Claude` teammate for Slack. It replaces the old per-user Claude in Slack app. If you're already on Cursor, the [Cursor Cloud Agents setup](cursor-cloud-agents.md) does the same thing.

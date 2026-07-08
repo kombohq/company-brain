@@ -17,6 +17,6 @@ this project adheres to [Semantic Versioning](https://semver.org/).
 - CI: lint (oxlint), format check (prettier), typecheck, tests (`bun test`)
 - Secret scanning (TruffleHog) and lefthook pre-commit hook (format + lint)
 - e2e happy-path tests for the Zendesk and web connectors
-- Docs: getting-started guide, per-connector docs, Cursor Cloud Agents and Claude Code on the web guides
+- Docs: getting-started guide, per-connector docs, Claude Tag (recommended) and Cursor Cloud Agents guides for shared Slack access
 - Docs: security considerations page, plus `harden-package-managers.sh` to set a global minimum release age (supply-chain guard)
 - OSS community files (license, contributing scaffold)
