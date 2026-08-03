@@ -31,7 +31,7 @@ function run(cmd: string, args: string[], cwd?: string): void {
   }
 }
 
-function repoName(repoUrl: string): string {
+export function repoName(repoUrl: string): string {
   const name = repoUrl
     .replace(/\/+$/, "")
     .replace(/\.git$/, "")
@@ -46,7 +46,7 @@ function repoName(repoUrl: string): string {
 }
 
 /** Resolve "owner/name" to a github.com clone URL, leaving full URLs untouched. */
-function remoteUrl(repoUrl: string): string {
+export function remoteUrl(repoUrl: string): string {
   if (/^[\w.-]+\/[\w.-]+$/.test(repoUrl)) {
     return `https://github.com/${repoUrl.replace(/\.git$/, "")}.git`;
   }
@@ -94,7 +94,9 @@ async function syncRepo(): Promise<void> {
   console.log(`Synced ${repoUrl}#${ref} into ${outDir}`);
 }
 
-syncRepo().catch((err) => {
-  console.error("Repo sync failed:", err);
-  process.exit(1);
-});
+if (import.meta.main) {
+  syncRepo().catch((err) => {
+    console.error("Repo sync failed:", err);
+    process.exit(1);
+  });
+}
